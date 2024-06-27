@@ -23,7 +23,7 @@ class GymMember {
   final String? imageUrl;
   bool isActive;
   final List<String> purchaseOrderHistories;
-  final String dietID;
+  final List<String> dietID;
   final int daysAttended;
 
   // Constructor
@@ -76,8 +76,8 @@ class GymMember {
       'gender': gender,
       'currentPackageID': currentPackageID,
       'membershipDuration': membershipDuration,
-      'membershipStartDate': membershipStartDate.toIso8601String(),
-      'membershipEndDate': membershipEndDate.toIso8601String(),
+      'membershipStartDate': membershipStartDate.toString(),
+      'membershipEndDate': membershipEndDate.toString(),
       'level': level.toString().split('.').last, // Convert enum to string
       'email': email,
       'phoneNumber': phoneNumber,

@@ -6,6 +6,10 @@ import '../Models/Member.dart'; // Update path as per your project structure
 import 'package:kumbu_admin/Common/ThemeData.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../Models/Package.dart';
+import '../service/MemberService.dart';
+import '../service/PackageService.dart';
+
 class AddMemberPage extends StatefulWidget {
   @override
   State<AddMemberPage> createState() => _AddMemberPageState();
@@ -26,6 +30,10 @@ class _AddMemberPageState extends State<AddMemberPage> {
 
   File? _image;
   final picker = ImagePicker();
+  final MemberService _memberService = MemberService();
+  List<Package> _packages = [];
+  Package? _selectedPackage;
+
 
   Future getImage() async {
     final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
@@ -34,6 +42,25 @@ class _AddMemberPageState extends State<AddMemberPage> {
         _image = File(pickedFile.path);
         imageUrlController.text = pickedFile.path; // Update controller with image path
       });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchPackages();
+  }
+
+  Future<void> _fetchPackages() async {
+    try {
+      PackageService packageService = PackageService();
+      List<Package> fetchedPackages = await packageService.getPackages();
+      setState(() {
+        _packages = fetchedPackages;
+      });
+    } catch (e) {
+      // Handle error
+      print('Error fetching packages: $e');
     }
   }
 
@@ -242,6 +269,7 @@ class _AddMemberPageState extends State<AddMemberPage> {
     );
   }
 
+
   Widget _buildPackageDropdown(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -251,18 +279,19 @@ class _AddMemberPageState extends State<AddMemberPage> {
           style: TextStyle(color: Colors.white70),
         ),
         SizedBox(height: 8),
-        DropdownButtonFormField<String>(
-          value: packageController.text.isNotEmpty ? packageController.text : null,
-          onChanged: (newValue) {
+        DropdownButtonFormField<Package>(
+          value: _selectedPackage,
+          hint: Text('Select Package'),
+          onChanged: (Package? newValue) {
             setState(() {
-              packageController.text = newValue!;
+              _selectedPackage = newValue;
+              packageController.text = newValue?.packageID ?? '';
             });
           },
-          items: <String>['Package A', 'Package B', 'Package C'] // Replace with actual package names
-              .map<DropdownMenuItem<String>>((String value) {
-            return DropdownMenuItem<String>(
-              value: value,
-              child: Text(value),
+          items: _packages.map((Package package) {
+            return DropdownMenuItem<Package>(
+              value: package,
+              child: Text('${package.level} - ${package.getReadableDuration()} - \$${package.amount}'),
             );
           }).toList(),
           decoration: InputDecoration(
@@ -354,16 +383,21 @@ class _AddMemberPageState extends State<AddMemberPage> {
       membershipStartDate: DateTime.parse(membershipStartDate),
       membershipEndDate: DateTime.parse(membershipEndDate),
       id: '', // Assign member ID as needed
-      currentPackageID: selectedPackage, // Assign selected package
+      currentPackageID: _selectedPackage!.packageID, // Assign selected package
       level: MembershipLevel.BRONZE, // Example: Set membership level
-      dietID: '', // Example: Set diet ID
+      dietID: [''], // Example: Set diet ID
       daysAttended: 0, // Example: Set days attended
     );
-
-    // Handle saving or updating logic here (e.g., send to backend, save locally, etc.)
-    // Example: Send newMember to API, save to database, etc.
-
-    // Optionally, navigate back to previous screen after saving
-    Navigator.pop(context);
+    try {
+      _memberService.addMember(newMember); // Await if you need to handle response or errors
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Member added successfully')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to add member: $e')),
+      );
+    }
+    // Navigator.pop(context);
   }
 }
