@@ -1,16 +1,30 @@
+enum MembershipLevel {
+  BRONZE,
+  SILVER,
+  GOLD,
+  DIAMOND,
+  PLATINUM,
+}
+
 class GymMember {
   // Properties
   final String id;
   final String name;
   final int age;
   final String gender;
-  final String membershipType;
+  final String currentPackageID; // Not sure what this field represents, may need clarification
   final String membershipDuration;
   final DateTime membershipStartDate;
   final DateTime membershipEndDate;
+  final MembershipLevel level;
   final String email;
   final String phoneNumber;
   final String address;
+  final String? imageUrl;
+  bool isActive;
+  final List<String> purchaseOrderHistories;
+  final String dietID;
+  final int daysAttended;
 
   // Constructor
   GymMember({
@@ -18,25 +32,39 @@ class GymMember {
     required this.name,
     required this.age,
     required this.gender,
-    required this.membershipType,
+    required this.currentPackageID,
     required this.membershipDuration,
     required this.membershipStartDate,
     required this.membershipEndDate,
+    required this.level,
     required this.email,
     required this.phoneNumber,
     required this.address,
+    this.imageUrl,
+    this.isActive = true,
+    this.purchaseOrderHistories = const [],
+    required this.dietID,
+    required this.daysAttended,
   });
 
   // Method to calculate the remaining days of membership
   int getRemainingDays() {
     final today = DateTime.now();
-    return membershipEndDate.difference(today).inDays;
+    int days = membershipEndDate.difference(today).inDays;
+    if (days < 0) {
+      isActive = false;
+    }
+    return days;
   }
 
   // Method to check if membership is active
   bool isMembershipActive() {
     final today = DateTime.now();
     return today.isBefore(membershipEndDate);
+  }
+
+  String get subscriptionDue {
+    return '${getRemainingDays()} days remaining';
   }
 
   // Method to convert GymMember object to a Map (useful for JSON serialization)
@@ -46,12 +74,19 @@ class GymMember {
       'name': name,
       'age': age,
       'gender': gender,
-      'membershipType': membershipType,
+      'currentPackageID': currentPackageID,
+      'membershipDuration': membershipDuration,
       'membershipStartDate': membershipStartDate.toIso8601String(),
       'membershipEndDate': membershipEndDate.toIso8601String(),
+      'level': level.toString().split('.').last, // Convert enum to string
       'email': email,
       'phoneNumber': phoneNumber,
       'address': address,
+      'imageUrl': imageUrl,
+      'isActive': isActive,
+      'purchaseOrderHistories': purchaseOrderHistories,
+      'dietID': dietID,
+      'daysAttended': daysAttended,
     };
   }
 
@@ -62,13 +97,19 @@ class GymMember {
       name: map['name'],
       age: map['age'],
       gender: map['gender'],
-      membershipType: map['membershipType'],
+      currentPackageID: map['currentPackageID'],
       membershipDuration: map['membershipDuration'],
       membershipStartDate: DateTime.parse(map['membershipStartDate']),
       membershipEndDate: DateTime.parse(map['membershipEndDate']),
+      level: MembershipLevel.values.firstWhere((e) => e.toString().split('.').last == map['level']),
       email: map['email'],
       phoneNumber: map['phoneNumber'],
       address: map['address'],
+      imageUrl: map['imageUrl'],
+      isActive: map['isActive'],
+      purchaseOrderHistories: List<String>.from(map['purchaseOrderHistories']),
+      dietID: map['dietID'],
+      daysAttended: map['daysAttended'],
     );
   }
 }
