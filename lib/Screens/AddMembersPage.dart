@@ -23,7 +23,7 @@ class _AddMemberPageState extends State<AddMemberPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneNumberController = TextEditingController();
   final TextEditingController addressController = TextEditingController();
-  final TextEditingController membershipDurationController = TextEditingController();
+  // final TextEditingController membershipDurationController = TextEditingController();
   final TextEditingController membershipStartDateController = TextEditingController();
   final TextEditingController membershipEndDateController = TextEditingController();
   final TextEditingController packageController = TextEditingController();
@@ -122,7 +122,6 @@ class _AddMemberPageState extends State<AddMemberPage> {
           _buildTextField(context, 'Phone Number', phoneNumberController),
           _buildTextField(context, 'Address', addressController),
           _buildPackageDropdown(context), // Package selection dropdown
-          _buildTextField(context, 'Membership Duration', membershipDurationController),
           _buildDateField(context, 'Membership Start Date', membershipStartDateController),
           _buildDateField(context, 'Membership End Date', membershipEndDateController),
           SizedBox(height: 20),
@@ -198,7 +197,6 @@ class _AddMemberPageState extends State<AddMemberPage> {
                       ),
                       SizedBox(height: 20),
                       _buildPackageDropdown(context), // Package selection dropdown
-                      _buildTextField(context, 'Membership Duration', membershipDurationController),
                       _buildDateField(context, 'Membership Start Date', membershipStartDateController),
                       _buildDateField(context, 'Membership End Date', membershipEndDateController),
                       SizedBox(height: 20),
@@ -272,13 +270,7 @@ class _AddMemberPageState extends State<AddMemberPage> {
 
   Widget _buildPackageDropdown(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          'Select Package',
-          style: TextStyle(color: Colors.white70),
-        ),
-        SizedBox(height: 8),
         DropdownButtonFormField<Package>(
           value: _selectedPackage,
           hint: Text('Select Package'),
@@ -307,7 +299,7 @@ class _AddMemberPageState extends State<AddMemberPage> {
             fillColor: Colors.white10,
           ),
         ),
-        SizedBox(height: 16),
+        SizedBox(height: 16,)
       ],
     );
   }
@@ -365,7 +357,7 @@ class _AddMemberPageState extends State<AddMemberPage> {
     String email = emailController.text;
     String phoneNumber = phoneNumberController.text;
     String address = addressController.text;
-    String membershipDuration = membershipDurationController.text;
+    String membershipDuration = _selectedPackage!.getReadableDuration();
     String membershipStartDate = membershipStartDateController.text;
     String membershipEndDate = membershipEndDateController.text;
     String selectedPackage = packageController.text; // Get selected package
@@ -383,9 +375,10 @@ class _AddMemberPageState extends State<AddMemberPage> {
       membershipStartDate: DateTime.parse(membershipStartDate),
       membershipEndDate: DateTime.parse(membershipEndDate),
       id: '', // Assign member ID as needed
-      currentPackageID: _selectedPackage!.packageID, // Assign selected package
+      gymMemberID: 0,
+      currentPackage: _selectedPackage, // Assign selected package
       level: MembershipLevel.BRONZE, // Example: Set membership level
-      dietID: [''], // Example: Set diet ID
+      diets: [], // Example: Set diet ID
       daysAttended: 0, // Example: Set days attended
     );
     try {

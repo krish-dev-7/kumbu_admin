@@ -1,21 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:kumbu_admin/Common/ThemeData.dart';
+import 'package:kumbu_admin/Screens/AppDrawer.dart';
 import '../Models/Member.dart'; // Update path as per your project structure
+import '../service/MemberService.dart';
 import 'AddMembersPage.dart';
 import 'MembersDetailsPage.dart';
 
 enum MemberFilter { all, active, inactive }
 
 class MembersListPage extends StatefulWidget {
-  final List<GymMember> members;
-
-  MembersListPage({required this.members});
 
   @override
   _MembersListPageState createState() => _MembersListPageState();
 }
 
 class _MembersListPageState extends State<MembersListPage> {
+  List<GymMember> _members = [];
+  bool _isLoading = true;
   List<GymMember> filteredMembers = [];
   MemberFilter _selectedFilter = MemberFilter.all;
   String searchQuery = "";
@@ -23,12 +24,12 @@ class _MembersListPageState extends State<MembersListPage> {
   @override
   void initState() {
     super.initState();
-    _updateFilteredMembers();
+    _fetchMembers();
   }
 
   void _updateFilteredMembers() {
     setState(() {
-      filteredMembers = widget.members.where((member) {
+      filteredMembers = _members.where((member) {
         switch (_selectedFilter) {
           case MemberFilter.active:
             return member.isActive;
@@ -52,28 +53,48 @@ class _MembersListPageState extends State<MembersListPage> {
     });
   }
 
+  Future<void> _fetchMembers() async {
+    try {
+      MemberService memberService = MemberService();
+      List<GymMember> memberList = await memberService.getAllMembers();
+      setState(() {
+        _members = memberList;
+        _isLoading = false;
+      });
+      _updateFilteredMembers();
+    } catch (e) {
+      print('Error fetching members: $e');
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Members List'),
       ),
-      body: Column(
+      drawer: AppDrawer(),
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          :Column(
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Container(
               decoration: BoxDecoration(
-                border: Border.all(color: appLightGreen, width: 1),
+                border: Border.all(color: Colors.white, width: 1),
               ),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
+                     Text(
                       "Members: ",
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      style: TextStyle(fontWeight: FontWeight.bold,  color: appLightGreen),
                     ),
                     const SizedBox(width: 10),
                     _buildRadioButton('All', MemberFilter.all),
@@ -89,14 +110,14 @@ class _MembersListPageState extends State<MembersListPage> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Search by name or ID',
                 labelStyle: TextStyle(color: Colors.white70),
                 enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white),
+                  borderSide: BorderSide(color: appLightGreen),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white),
+                  borderSide: BorderSide(color: appLightGreen),
                 ),
                 prefixIcon: Icon(Icons.search),
               ),
@@ -113,7 +134,7 @@ class _MembersListPageState extends State<MembersListPage> {
               padding: const EdgeInsets.all(8.0),
               child: Container(
                 decoration: BoxDecoration(
-                  border: Border.all(color: appLightGreen, width: 1),
+                  // border: Border.all(color: Colors.white, width: 1),
                 ),
                 child: LayoutBuilder(
                   builder: (context, constraints) {
@@ -179,7 +200,7 @@ class _MembersListPageState extends State<MembersListPage> {
                                                   Icon(Icons.card_membership, color: appLightGreen, size: 14),
                                                   const SizedBox(width: 8),
                                                   Text(
-                                                    'ID: ${member.id}',
+                                                    'ID: ${member.gymMemberID}',
                                                     style: TextStyle(
                                                       color: Colors.white70,
                                                     ),
@@ -205,7 +226,7 @@ class _MembersListPageState extends State<MembersListPage> {
                                                   Icon(Icons.access_time, color: appLightGreen, size: 14),
                                                   const SizedBox(width: 8),
                                                   Text(
-                                                    '${member.membershipDuration}',
+                                                    '${member.getMembershipDuration()}',
                                                     style: TextStyle(
                                                       color: Colors.white70,
                                                     ),
@@ -225,6 +246,7 @@ class _MembersListPageState extends State<MembersListPage> {
                                   child: Container(
                                     decoration: BoxDecoration(
                                       color: Colors.grey.withOpacity(0.6),
+                                      borderRadius: BorderRadius.circular(12)
                                     ),
                                     child: Center(
                                       child: Text(

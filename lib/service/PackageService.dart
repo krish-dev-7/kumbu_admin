@@ -25,4 +25,62 @@ class PackageService {
       throw Exception('Error fetching packages: $e');
     }
   }
+
+  Future<void> addPackage(Package newPackage) async {
+    String apiUrl = '$baseUrl/api/packages';
+    try {
+      var response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(newPackage.toJson()),
+      );
+      print(response.body);
+      if (response.statusCode == 201) {
+        // Package added successfully
+        return;
+      } else {
+        throw Exception('Failed to add package');
+      }
+    } catch (e) {
+      throw Exception('Error adding package: $e');
+    }
+  }
+  Future<void> updatePackage(Package updatedPackage) async {
+    String apiUrl = '$baseUrl/api/packages/${updatedPackage.packageID}';
+    try {
+      var response = await http.put(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(updatedPackage.toJson()),
+      );
+
+      if (response.statusCode == 200) {
+        // Package updated successfully
+        return;
+      } else {
+        throw Exception('Failed to update package');
+      }
+    } catch (e) {
+      throw Exception('Error updating package: $e');
+    }
+  }
+
+  Future<void> deletePackage(String packageID) async {
+    String apiUrl = '$baseUrl/api/packages/$packageID';
+    try {
+      var response = await http.delete(Uri.parse(apiUrl));
+      if (response.statusCode == 200) {
+        // Package deleted successfully
+        return;
+      } else {
+        throw Exception('Failed to delete package');
+      }
+    } catch (e) {
+      throw Exception('Error deleting package: $e');
+    }
+  }
 }

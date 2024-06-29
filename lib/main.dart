@@ -1,106 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:kumbu_admin/Common/ThemeData.dart';
+import 'package:kumbu_admin/Screens/RequestPage.dart';
 
 import 'Models/Member.dart';
 import 'Screens/MembersListPage.dart';
+import 'Screens/PackagePage.dart';
+import 'Screens/ProfilePage.dart';
 
 void main() {
-  List<GymMember> members = [
-    GymMember(
-      id: '1',
-      name: 'Alice',
-      age: 28,
-      gender: 'Female',
-      currentPackageID: 'p1',
-      membershipDuration: '2 year',
-      membershipStartDate: DateTime(2023, 1, 1),
-      membershipEndDate: DateTime(2025, 1, 1),
-      level: MembershipLevel.GOLD,
-      email: 'alice@example.com',
-      phoneNumber: '123-456-7890',
-      address: '123 Main St, Anytown, USA',
-      isActive: true,
-      purchaseOrderHistories: ['po1', 'po2'],
-      dietID: ['d1'],
-      daysAttended: 100,
-    ),
-    GymMember(
-      id: '2',
-      name: 'Bob',
-      age: 34,
-      gender: 'Male',
-      currentPackageID: 'p2',
-      membershipDuration: '1 month',
-      membershipStartDate: DateTime(2024, 6, 10),
-      membershipEndDate: DateTime(2024, 7, 10),
-      level: MembershipLevel.SILVER,
-      email: 'bob@example.com',
-      phoneNumber: '098-765-4321',
-      address: '456 Elm St, Othertown, USA',
-      isActive: true,
-      purchaseOrderHistories: ['po3'],
-      dietID: ['d2'],
-      daysAttended: 20,
-    ),
-    GymMember(
-      id: '3',
-      name: 'Charlie',
-      age: 22,
-      gender: 'Male',
-      currentPackageID: 'p3',
-      membershipDuration: '1 year',
-      membershipStartDate: DateTime(2024, 2, 1),
-      membershipEndDate: DateTime(2025, 2, 1),
-      level: MembershipLevel.BRONZE,
-      email: 'charlie@example.com',
-      phoneNumber: '123-123-1234',
-      address: '789 Oak St, Somewhere, USA',
-      isActive: true,
-      purchaseOrderHistories: [],
-      dietID: ['d2'],
-      daysAttended: 50,
-    ),
-    GymMember(
-      id: '4',
-      name: 'David',
-      age: 45,
-      gender: 'Male',
-      currentPackageID: 'p4',
-      membershipDuration: '1 month',
-      membershipStartDate: DateTime(2023, 3, 15),
-      membershipEndDate: DateTime(2023, 4, 15),
-      level: MembershipLevel.SILVER,
-      email: 'david@example.com',
-      phoneNumber: '321-654-0987',
-      address: '101 Maple St, Anytown, USA',
-      isActive: false,
-      purchaseOrderHistories: ['po4'],
-      dietID: ['d2'],
-      daysAttended: 10,
-    ),
-    GymMember(
-      id: '5',
-      name: 'Eve',
-      age: 29,
-      gender: 'Female',
-      currentPackageID: 'p5',
-      membershipDuration: '1 year',
-      membershipStartDate: DateTime(2024, 4, 1),
-      membershipEndDate: DateTime(2025, 4, 1),
-      level: MembershipLevel.GOLD,
-      email: 'eve@example.com',
-      phoneNumber: '456-789-1230',
-      address: '202 Pine St, Othertown, USA',
-      isActive: true,
-      purchaseOrderHistories: [],
-      dietID: ['d2'],
-      daysAttended: 70,
-    ),
-
-  ];
 
   runApp(MaterialApp(
     theme: appTheme,
-    home: MembersListPage(members: members),
+    home: MembersListPage(),
+    initialRoute: '/',
+    routes: {
+      '/package': (context) => PackagePage(),
+      '/profile': (context) => ProfilePage(),
+      '/requestPage': (context) => QuotationPage()
+    },
   ));
 }

@@ -90,7 +90,7 @@ class MemberDetailsPage extends StatelessWidget {
 
   Widget _buildMembershipDetailsTable() {
     return _buildDetailTable([
-      _buildDetailRow(Icons.access_time, 'Membership Duration', member.membershipDuration),
+      _buildDetailRow(Icons.access_time, 'Membership Duration', member.getMembershipDuration()),
       _buildDetailRow(Icons.calendar_today, 'Membership Start Date', _formatDate(member.membershipStartDate)),
       _buildDetailRow(Icons.calendar_today, 'Membership End Date', _formatDate(member.membershipEndDate)),
     ]);
@@ -98,7 +98,10 @@ class MemberDetailsPage extends StatelessWidget {
 
   Widget _buildPackageDetails() {
     return _buildDetailTable([
-      _buildDetailRow(Icons.star, 'Package', member.currentPackageID ?? 'N/A'),
+      _buildDetailRow(Icons.star, 'Package ID', member.currentPackage?.packageID ?? 'N/A'),
+      _buildDetailRow(Icons.timer, 'Duration', '${member.currentPackage?.packageDuration ?? 'N/A'} days'),
+      _buildDetailRow(Icons.label, 'Level', member.currentPackage?.level ?? 'N/A'),
+      _buildDetailRow(Icons.monetization_on, 'Amount', member.currentPackage != null ? '\$${member.currentPackage!.amount.toStringAsFixed(2)}' : 'N/A'),
     ]);
   }
 

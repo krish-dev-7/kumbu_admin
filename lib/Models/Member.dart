@@ -1,3 +1,7 @@
+import 'Diet.dart';
+import 'Package.dart';
+import 'PurchaseOrder.dart';
+
 enum MembershipLevel {
   BRONZE,
   SILVER,
@@ -6,13 +10,14 @@ enum MembershipLevel {
   PLATINUM,
 }
 
+
 class GymMember {
-  // Properties
   final String id;
+  final int gymMemberID;
   final String name;
   final int age;
   final String gender;
-  final String currentPackageID; // Not sure what this field represents, may need clarification
+  final Package? currentPackage;
   final String membershipDuration;
   final DateTime membershipStartDate;
   final DateTime membershipEndDate;
@@ -22,17 +27,17 @@ class GymMember {
   final String address;
   final String? imageUrl;
   bool isActive;
-  final List<String> purchaseOrderHistories;
-  final List<String> dietID;
+  final List<dynamic> purchaseOrderHistories;
+  final List<dynamic> diets;
   final int daysAttended;
 
-  // Constructor
   GymMember({
     required this.id,
+    required this.gymMemberID,
     required this.name,
     required this.age,
     required this.gender,
-    required this.currentPackageID,
+    this.currentPackage,
     required this.membershipDuration,
     required this.membershipStartDate,
     required this.membershipEndDate,
@@ -43,7 +48,7 @@ class GymMember {
     this.imageUrl,
     this.isActive = true,
     this.purchaseOrderHistories = const [],
-    required this.dietID,
+    this.diets = const [],
     required this.daysAttended,
   });
 
@@ -67,14 +72,18 @@ class GymMember {
     return '${getRemainingDays()} days remaining';
   }
 
+  String getMembershipDuration() {
+    return currentPackage?.getReadableDuration()??membershipDuration;
+  }
+
   // Method to convert GymMember object to a Map (useful for JSON serialization)
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
+      'gymMemberID': gymMemberID,
       'name': name,
       'age': age,
       'gender': gender,
-      'currentPackageID': currentPackageID,
+      'currentPackageID': currentPackage?.packageID,
       'membershipDuration': membershipDuration,
       'membershipStartDate': membershipStartDate.toString(),
       'membershipEndDate': membershipEndDate.toString(),
@@ -84,8 +93,8 @@ class GymMember {
       'address': address,
       'imageUrl': imageUrl,
       'isActive': isActive,
-      'purchaseOrderHistories': purchaseOrderHistories,
-      'dietID': dietID,
+      'purchaseOrderHistories': purchaseOrderHistories.map((order) => order.toMap()).toList(),
+      'diets': diets.map((diet) => diet.toMap()).toList(),
       'daysAttended': daysAttended,
     };
   }
@@ -93,11 +102,12 @@ class GymMember {
   // Method to create a GymMember object from a Map (useful for JSON deserialization)
   factory GymMember.fromMap(Map<String, dynamic> map) {
     return GymMember(
-      id: map['id'],
+      id: map['_id'],
+      gymMemberID: map['gymMemberID'],
       name: map['name'],
       age: map['age'],
       gender: map['gender'],
-      currentPackageID: map['currentPackageID'],
+      currentPackage: Package.fromJson(map['currentPackageID']),
       membershipDuration: map['membershipDuration'],
       membershipStartDate: DateTime.parse(map['membershipStartDate']),
       membershipEndDate: DateTime.parse(map['membershipEndDate']),
@@ -107,9 +117,23 @@ class GymMember {
       address: map['address'],
       imageUrl: map['imageUrl'],
       isActive: map['isActive'],
-      purchaseOrderHistories: List<String>.from(map['purchaseOrderHistories']),
-      dietID: map['dietID'],
+      purchaseOrderHistories: List<dynamic>.from(map['purchaseOrderHistories'].map((order) => PurchaseOrder.fromMap(order))),
+      diets: List<dynamic>.from(map['dietID'].map((diet) => Diet.fromJson(diet))),
       daysAttended: map['daysAttended'],
     );
+  }
+}
+
+
+
+
+extension DietExt on Diet {
+  Map<String, dynamic> toMap() {
+    return {
+      'dietID': dietID,
+      'period': period,
+      'quantity': quantity,
+      'food': food,
+    };
   }
 }

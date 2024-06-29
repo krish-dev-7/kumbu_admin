@@ -1,11 +1,11 @@
 class Package {
-  final String packageID;
+  final String? packageID;
   final int packageDuration;
   final String level;
   final double amount;
 
   Package({
-    required this.packageID,
+    this.packageID="",
     required this.packageDuration,
     required this.level,
     required this.amount,
@@ -13,7 +13,7 @@ class Package {
 
   factory Package.fromJson(Map<String, dynamic> json) {
     return Package(
-      packageID: json['packageID'],
+      packageID: json['_id'],
       packageDuration: json['packageDuration'],
       level: json['level'],
       amount: json['amount'].toDouble(),
@@ -22,7 +22,7 @@ class Package {
 
   Map<String, dynamic> toJson() {
     return {
-      'packageID': packageID,
+      // 'packageID': packageID,
       'packageDuration': packageDuration,
       'level': level,
       'amount': amount,

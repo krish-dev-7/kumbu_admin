@@ -26,4 +26,21 @@ class MemberService {
       throw Exception('Error adding member: $e');
     }
   }
+
+  Future<List<GymMember>> getAllMembers() async {
+    String apiUrl = '$baseUrl/api/members'; // Replace with your specific endpoint
+    try {
+      var response = await http.get(Uri.parse(apiUrl));
+
+      if (response.statusCode == 200) {
+        List<dynamic> jsonData = jsonDecode(response.body);
+        // print(jsonData);
+        return jsonData.map((member) => GymMember.fromMap(member)).toList();
+      } else {
+        throw Exception('Failed to load members');
+      }
+    } catch (e) {
+      throw Exception('Error fetching members: $e');
+    }
+  }
 }
