@@ -28,7 +28,7 @@ final ThemeData appTheme = ThemeData(
   ),
 
   buttonTheme: const ButtonThemeData(
-    buttonColor: Color(0xFF00875F),
+    buttonColor: Color(0xFF00B37E),
   ),
   inputDecorationTheme: InputDecorationTheme(
     filled: true,

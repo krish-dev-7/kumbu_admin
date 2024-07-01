@@ -22,4 +22,25 @@ class QuotationService {
       throw Exception('Error fetching quotations: $e');
     }
   }
+
+  Future<void> approveQuotation(String quotationID) async {
+    final response = await http.put(
+      Uri.parse('$baseUrl/api/quotations/$quotationID'),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({'isApproved': true}),
+    );
+    print(response.body);
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to approve quotation');
+    }
+  }
+
+  Future<void> deleteQuotation(String quotationID) async {
+    final response = await http.delete(Uri.parse('$baseUrl/api/quotations/$quotationID'));
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to delete quotation');
+    }
+  }
 }

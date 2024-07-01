@@ -41,6 +41,13 @@ class AppDrawer extends StatelessWidget {
               Navigator.pushNamed(context, '/requestPage');
             },
           ),
+          ListTile(
+            leading: Icon(Icons.set_meal_sharp),
+            title: Text('Diets'),
+            onTap: () {
+              Navigator.pushNamed(context, '/dietsPage');
+            },
+          ),
         ],
       ),
     );

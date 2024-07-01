@@ -2,7 +2,7 @@
 class Diet {
   final String dietID;
   final String period;
-  final int quantity;
+  final String quantity;
   final String food;
 
   Diet({
@@ -14,7 +14,7 @@ class Diet {
 
   factory Diet.fromJson(Map<String, dynamic> json) {
     return Diet(
-      dietID: json['dietID'],
+      dietID: json['_id'],
       period: json['period'],
       quantity: json['quantity'],
       food: json['food'],

@@ -34,13 +34,26 @@ class MemberService {
 
       if (response.statusCode == 200) {
         List<dynamic> jsonData = jsonDecode(response.body);
-        // print(jsonData);
+        print(jsonData);
         return jsonData.map((member) => GymMember.fromMap(member)).toList();
       } else {
         throw Exception('Failed to load members');
       }
     } catch (e) {
       throw Exception('Error fetching members: $e');
+    }
+  }
+
+  Future<void> updateDietTemplateId(String memberId, String dietTemplateId) async {
+    String apiUrl = '$baseUrl/api/members';
+    final response = await http.patch(
+      Uri.parse('$apiUrl/$memberId'),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({'dietTemplateID': dietTemplateId}),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to update diet template ID');
     }
   }
 }

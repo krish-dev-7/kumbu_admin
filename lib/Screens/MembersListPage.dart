@@ -44,7 +44,7 @@ class _MembersListPageState extends State<MembersListPage> {
       if (searchQuery.isNotEmpty) {
         filteredMembers = filteredMembers.where((member) {
           return member.name.toLowerCase().contains(searchQuery.toLowerCase()) ||
-              member.id.toString().contains(searchQuery);
+              member.gymMemberID.toString().contains(searchQuery);
         }).toList();
       }
 

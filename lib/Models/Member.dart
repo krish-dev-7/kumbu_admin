@@ -28,7 +28,7 @@ class GymMember {
   final String? imageUrl;
   bool isActive;
   final List<dynamic> purchaseOrderHistories;
-  final List<dynamic> diets;
+  final String dietTemplateID;
   final int daysAttended;
 
   GymMember({
@@ -48,7 +48,7 @@ class GymMember {
     this.imageUrl,
     this.isActive = true,
     this.purchaseOrderHistories = const [],
-    this.diets = const [],
+    this.dietTemplateID = "",
     required this.daysAttended,
   });
 
@@ -94,7 +94,7 @@ class GymMember {
       'imageUrl': imageUrl,
       'isActive': isActive,
       'purchaseOrderHistories': purchaseOrderHistories.map((order) => order.toMap()).toList(),
-      'diets': diets.map((diet) => diet.toMap()).toList(),
+      'dietTemplateID': "",
       'daysAttended': daysAttended,
     };
   }
@@ -118,7 +118,7 @@ class GymMember {
       imageUrl: map['imageUrl'],
       isActive: map['isActive'],
       purchaseOrderHistories: List<dynamic>.from(map['purchaseOrderHistories'].map((order) => PurchaseOrder.fromMap(order))),
-      diets: List<dynamic>.from(map['dietID'].map((diet) => Diet.fromJson(diet))),
+      dietTemplateID: map['dietTemplateID'] ?? "",
       daysAttended: map['daysAttended'],
     );
   }

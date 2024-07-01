@@ -3,12 +3,12 @@ import 'package:flutter/foundation.dart';
 import 'Package.dart';
 
 class Quotation {
-  final String quotationID;
+  final String quotationID; //_id
   final String requesterName;
   final int requesterID;
   final String requesterNumber;
   final Package package; // Nested object
-  final bool isApproved;
+  late final bool isApproved;
   final bool isPaid;
 
   Quotation({
@@ -23,7 +23,7 @@ class Quotation {
 
   factory Quotation.fromJson(Map<String, dynamic> json) {
     return Quotation(
-      quotationID: json['quotationID'],
+      quotationID: json['_id'],
       requesterName: json['requester']['name'],
       requesterID: json['requester']['gymMemberID'],
       requesterNumber: json['requester']['phoneNumber'],

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kumbu_admin/Common/ThemeData.dart';
 import 'package:kumbu_admin/Screens/RequestPage.dart';
+import 'package:kumbu_admin/Screens/diets/DietsTemplatePage.dart';
 
 import 'Models/Member.dart';
 import 'Screens/MembersListPage.dart';
@@ -16,7 +17,8 @@ void main() {
     routes: {
       '/package': (context) => PackagePage(),
       '/profile': (context) => ProfilePage(),
-      '/requestPage': (context) => QuotationPage()
+      '/requestPage': (context) => QuotationPage(),
+      '/dietsPage': (context) => DietTemplatesPage()
     },
   ));
 }

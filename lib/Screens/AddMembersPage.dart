@@ -378,7 +378,7 @@ class _AddMemberPageState extends State<AddMemberPage> {
       gymMemberID: 0,
       currentPackage: _selectedPackage, // Assign selected package
       level: MembershipLevel.BRONZE, // Example: Set membership level
-      diets: [], // Example: Set diet ID
+      dietTemplateID: "", // Example: Set diet ID
       daysAttended: 0, // Example: Set days attended
     );
     try {
