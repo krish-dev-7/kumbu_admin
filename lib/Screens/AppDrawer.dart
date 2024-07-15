@@ -12,7 +12,7 @@ class AppDrawer extends StatelessWidget {
             decoration: BoxDecoration(
               color: appDarkGreen,
             ),
-            child: Column(
+            child: const Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -24,7 +24,7 @@ class AppDrawer extends StatelessWidget {
                   ),
                 ),
             Text(
-              'OWNER',
+              'Trainer',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 16,
@@ -39,34 +39,34 @@ class AppDrawer extends StatelessWidget {
           //     Navigator.pushNamed(context, '/profile');
           //   },
           // ),
-          ListTile(
-            leading: Icon(Icons.local_fire_department),
-            title: Text('Package Page'),
-            onTap: () {
-              Navigator.pushNamed(context, '/package');
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.water_drop_rounded),
-            title: Text('Requests'),
-            onTap: () {
-              Navigator.pushNamed(context, '/requestPage');
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.currency_rupee),
-            title: Text('Income Histories'),
-            onTap: () {
-              Navigator.pushNamed(context, '/incomeHistory');
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.set_meal_sharp),
-            title: Text('Diets'),
-            onTap: () {
-              Navigator.pushNamed(context, '/dietsPage');
-            },
-          ),
+          // ListTile(
+          //   leading: Icon(Icons.local_fire_department),
+          //   title: Text('Package Page'),
+          //   onTap: () {
+          //     Navigator.pushNamed(context, '/package');
+          //   },
+          // ),
+          // ListTile(
+          //   leading: Icon(Icons.water_drop_rounded),
+          //   title: Text('Requests'),
+          //   onTap: () {
+          //     Navigator.pushNamed(context, '/requestPage');
+          //   },
+          // ),
+          // ListTile(
+          //   leading: Icon(Icons.currency_rupee),
+          //   title: Text('Income Histories'),
+          //   onTap: () {
+          //     Navigator.pushNamed(context, '/incomeHistory');
+          //   },
+          // ),
+          // ListTile(
+          //   leading: Icon(Icons.set_meal_sharp),
+          //   title: Text('Diets'),
+          //   onTap: () {
+          //     Navigator.pushNamed(context, '/dietsPage');
+          //   },
+          // ),
           ListTile(
             leading: Icon(Icons.list_alt),
             title: Text('Entries'),
