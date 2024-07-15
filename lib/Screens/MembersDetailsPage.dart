@@ -74,12 +74,12 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.member.name),
-        actions: [
-          IconButton(
-            icon: Icon(_isEditing ? Icons.save : Icons.edit, size: 40,),
-            onPressed: _isEditing ? _saveChanges : _toggleEditing,
-          ),
-        ],
+        // actions: [
+        //   IconButton(
+        //     icon: Icon(_isEditing ? Icons.save : Icons.edit, size: 40,),
+        //     onPressed: _isEditing ? _saveChanges : _toggleEditing,
+        //   ),
+        // ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -413,25 +413,11 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
         // if (_isEditing)
           ElevatedButton(
             onPressed: () async {
-              if (_selectedDietTemplateId != null) {
-                try {
-                  await _memberService.updateDietTemplateId(widget.member.id, _selectedDietTemplateId!);
+
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text('Diet template assigned successfully'),
+                    content: Text('Lol, Bruh you are not owner!'),
                     backgroundColor: Colors.green,
                   ));
-                } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text('Failed to assign diet template: $e'),
-                    backgroundColor: Colors.red,
-                  ));
-                }
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text('Please select a diet template'),
-                  backgroundColor: Colors.orange,
-                ));
-              }
             },
             child: Text('Assign Diet', style: TextStyle(color: Colors.white)),
             style: ElevatedButton.styleFrom(backgroundColor: appLightGreen),

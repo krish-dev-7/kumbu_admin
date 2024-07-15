@@ -245,7 +245,7 @@ class _MembersListPageState extends State<MembersListPage> {
                                       color: Colors.grey.withOpacity(0.6),
                                       borderRadius: BorderRadius.circular(12)
                                     ),
-                                    child: Center(
+                                    child: const Center(
                                       child: Text(
                                         'Expired',
                                         style: TextStyle(
@@ -269,19 +269,19 @@ class _MembersListPageState extends State<MembersListPage> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => AddMemberPage()),
-          );
-        },
-        child: const Icon(
-          Icons.add,
-          color: Colors.white,
-        ),
-        backgroundColor: appDarkGreen,
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () {
+      //     Navigator.push(
+      //       context,
+      //       MaterialPageRoute(builder: (context) => AddMemberPage()),
+      //     );
+      //   },
+      //   child: const Icon(
+      //     Icons.add,
+      //     color: Colors.white,
+      //   ),
+      //   backgroundColor: appDarkGreen,
+      // ),
     );
   }
 
