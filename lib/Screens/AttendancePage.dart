@@ -58,6 +58,7 @@ class _AttendancePageState extends State<AttendancePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Attendance Records'),
+        actions: [IconButton(onPressed: (){Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>AttendancePage()));}, icon: Icon(Icons.refresh))],
       ),
       body: Column(
         children: [
