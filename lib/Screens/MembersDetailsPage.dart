@@ -6,8 +6,10 @@ import '../Models/Member.dart'; // Update path as per your project structure
 import 'package:kumbu_admin/Common/ThemeData.dart';
 import '../Models/Package.dart';
 import '../Models/PurchaseOrder.dart';
+import '../Models/WorkoutTemplate.dart';
 import '../service/PackageService.dart';
 import '../service/PurchaseOrderService.dart';
+import '../service/WorkoutTemplateService.dart';
 import 'PaymentHistoryPage.dart'; // Import the new page
 import '../service/MemberService.dart'; // Import MemberService
 
@@ -22,6 +24,7 @@ class MemberDetailsPage extends StatefulWidget {
 
 class _MemberDetailsPageState extends State<MemberDetailsPage> {
   MemberService _memberService = MemberService();
+  final WorkoutTemplateService _workoutService = WorkoutTemplateService();
   late List<DietTemplate> _dietTemplates = [];
   String? _selectedDietTemplateId;
   bool _isEditing = false;
@@ -44,6 +47,8 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
     super.initState();
     _fetchDietTemplates();
     _fetchPackages();
+    _fetchWorkoutTemplates();
+
 
 
     // Initialize controllers with existing member data
@@ -66,6 +71,33 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
       });
     } catch (e) {
       print('Failed to fetch diet templates: $e');
+    }
+  }
+
+  Future<void> _fetchWorkoutTemplates() async {
+    try {
+      List<WorkoutTemplate> workoutTemplates = await _workoutService.fetchWorkoutTemplates();
+      setState(() {
+        _workoutTemplates = workoutTemplates;
+      });
+    } catch (e) {
+      print('Failed to fetch diet templates: $e');
+    }
+  }
+
+  String? _selectedWorkoutTemplateId;
+  List<WorkoutTemplate> _workoutTemplates = [];
+
+
+
+  void _assignWorkoutTemplate() async {
+    if (_selectedWorkoutTemplateId != null) {
+      try {
+        await _workoutService.assignWorkoutTemplate(widget.member.id, _selectedWorkoutTemplateId!);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Workout Template Assigned')));
+      } catch (error) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to assign workout template: $error')));
+      }
     }
   }
 
@@ -107,6 +139,7 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
                   _buildSection(context, 'Membership Details', _buildMembershipDetailsTable()),
                   _buildSection(context, 'Package Details', _buildPackageDetails()),
                   _buildSection(context, 'Diet Assignment', _buildDietAssignmentSection()),
+                  _buildSection(context, 'Workout Assignment', _buildWorkoutAssignmentSection()),
                 ],
               ),
               SizedBox(height: 16),
@@ -436,6 +469,78 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
             child: Text('Assign Diet', style: TextStyle(color: Colors.white)),
             style: ElevatedButton.styleFrom(backgroundColor: appLightGreen),
           ),
+      ],
+    );
+  }
+  Widget _buildWorkoutAssignmentSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        DropdownButtonFormField<String>(
+          decoration: InputDecoration(
+            labelText: 'Select Workout Template',
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8.0),
+              borderSide: BorderSide(color: appLightGreen, width: 1.0),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8.0),
+              borderSide: BorderSide(color: appLightGreen, width: 1.0),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8.0),
+              borderSide: BorderSide(color: appLightGreen, width: 1.0),
+            ),
+          ),
+          value: _selectedWorkoutTemplateId,
+          onChanged: (newValue) {
+            setState(() {
+              _selectedWorkoutTemplateId = newValue;
+            });
+          },
+          items: _workoutTemplates.map((template) {
+            return DropdownMenuItem<String>(
+              value: template.id,
+              child: Text(template.templateName),
+            );
+          }).toList(),
+        ),
+        SizedBox(height: 16),
+        Text(
+          'Selected Workout template:',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: appLightGreen,
+          ),
+        ),
+        SizedBox(height: 8),
+        // if (_isEditing)
+        ElevatedButton(
+          onPressed: () async {
+            if (_selectedWorkoutTemplateId != null) {
+              try {
+                await _workoutService.assignWorkoutTemplate(widget.member.id, _selectedWorkoutTemplateId!);
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text('Workout assigned successfully'),
+                  backgroundColor: Colors.green,
+                ));
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text('Failed to assign workout template: $e'),
+                  backgroundColor: Colors.red,
+                ));
+              }
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text('Please select a workout template'),
+                backgroundColor: Colors.orange,
+              ));
+            }
+          },
+          child: Text('Assign Workouts', style: TextStyle(color: Colors.white)),
+          style: ElevatedButton.styleFrom(backgroundColor: appLightGreen),
+        ),
       ],
     );
   }

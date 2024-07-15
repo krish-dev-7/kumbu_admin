@@ -9,6 +9,7 @@ import 'Models/Member.dart';
 import 'Screens/MembersListPage.dart';
 import 'Screens/PackagePage.dart';
 import 'Screens/ProfilePage.dart';
+import 'Screens/workouts/WokoutTemplateListScreen.dart';
 
 void main() {
 
@@ -22,6 +23,7 @@ void main() {
       '/profile': (context) => ProfilePage(),
       '/requestPage': (context) => QuotationPage(),
       '/dietsPage': (context) => DietTemplatesPage(),
+      '/workoutPage': (context) => WorkoutTemplateListScreen(),
       '/incomeHistory': (context) => GlobalPaymentHistoryPage(),
       '/AttendancePage': (context) => AttendancePage()
     },

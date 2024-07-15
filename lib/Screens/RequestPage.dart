@@ -4,6 +4,7 @@ import 'package:kumbu_admin/service/PurchaseOrderService.dart';
 
 import '../Models/PurchaseOrder.dart';
 import '../Models/Quotation.dart';
+import '../service/MemberService.dart';
 import '../service/QuotationService.dart';
 
 class QuotationPage extends StatefulWidget {
@@ -146,29 +147,35 @@ class _QuotationCardState extends State<QuotationCard> {
     }
   }
 
-  // void _paidQuotation() async {
-  //   try {
-  //     await _quotationService.paidQuotation(widget.quotation.quotationID);
-  //     PurchaseOrder purchaseOrder = PurchaseOrder(
-  //       memberId:"",
-  //       gymMemberID: widget.quotation.requesterID,
-  //       packageId: widget.quotation.package.packageID??"",
-  //       timeOfPO: DateTime.now(),
-  //       amountPaid: widget.quotation.package.amount, membershipStartDate: DateTime., membershipEndDate: endDate, purchaseOrderId: '',
-  //     );
-  //     await _purchaseOrderService.addPurchaseOrder(purchaseOrder)
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text('Quotation approved successfully')),
-  //     );
-  //     // Optionally, refresh the list or update the state
-  //     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>QuotationPage()));
-  //   } catch (error) {
-  //     // Handle error
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text('Failed to approve quotation: $error')),
-  //     );
-  //   }
-  // }
+  void _paidQuotation() async {
+    try {
+      await _quotationService.paidQuotation(widget.quotation.quotationID);
+      PurchaseOrder purchaseOrder = PurchaseOrder(
+        memberId: widget.quotation.requesterUID,
+        gymMemberID: widget.quotation.requesterID,
+        packageId: widget.quotation.package.packageID??"",
+        timeOfPO: DateTime.now(),
+        amountPaid: widget.quotation.package.amount, membershipStartDate: DateTime.now(), membershipEndDate: DateTime.now().add(Duration(days: widget.quotation.package.packageDuration)), purchaseOrderId: '',
+      );
+      await _purchaseOrderService.addPurchaseOrder(purchaseOrder);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Quotation approved successfully')),
+      );
+
+      await MemberService().updateMembershipDetails(
+        widget.quotation.requesterUID,
+        widget.quotation.package.packageID ?? "",
+        DateTime.now().add(Duration(days: widget.quotation.package.packageDuration)),
+      );
+      // Optionally, refresh the list or update the state
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>QuotationPage()));
+    } catch (error) {
+      // Handle error
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to approve quotation: $error')),
+      );
+    }
+  }
 
   void _rejectQuotation() async {
     try {
@@ -261,17 +268,17 @@ class _QuotationCardState extends State<QuotationCard> {
                       ),
                     ),
                   ),
-                  // ElevatedButton.icon(
-                  //   onPressed: _paidQuotation,
-                  //   icon: Icon(Icons.check, color: Colors.white),
-                  //   label: Text('Paid', style: TextStyle(color: Colors.white)),
-                  //   style: ElevatedButton.styleFrom(
-                  //     backgroundColor: appDarkGreen, // Background color
-                  //     shape: RoundedRectangleBorder(
-                  //       borderRadius: BorderRadius.circular(20),
-                  //     ),
-                  //   ),
-                  // ),
+                  ElevatedButton.icon(
+                    onPressed: _paidQuotation,
+                    icon: Icon(Icons.check, color: Colors.white),
+                    label: Text('Paid', style: TextStyle(color: Colors.white)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: appDarkGreen, // Background color
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ]
