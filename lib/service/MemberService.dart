@@ -34,7 +34,7 @@ class MemberService {
 
       if (response.statusCode == 200) {
         List<dynamic> jsonData = jsonDecode(response.body);
-        print(jsonData);
+        // print(jsonData);
         return jsonData.map((member) => GymMember.fromMap(member)).toList();
       } else {
         throw Exception('Failed to load members');
@@ -54,6 +54,33 @@ class MemberService {
 
     if (response.statusCode != 200) {
       throw Exception('Failed to update diet template ID');
+    }
+  }
+
+  Future<void> updateMember(GymMember member) async {
+    final url = '$baseUrl/api/members/${member.id}';
+    final response = await http.put(
+      Uri.parse(url),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({
+        'name': member.name,
+        'age': member.age,
+        'gender': member.gender,
+        'email': member.email,
+        'phoneNumber': member.phoneNumber,
+        'address': member.address,
+        'dietTemplateID': member.dietTemplateID,
+        'currentPackageID':member.currentPackage?.packageID,
+        'membershipStartDate':member.membershipStartDate.toString(),
+        'membershipEndDate':member.membershipEndDate.toString(),
+        // Add other member fields as needed
+      }),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to update member');
     }
   }
 }

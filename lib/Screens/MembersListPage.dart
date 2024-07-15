@@ -47,9 +47,6 @@ class _MembersListPageState extends State<MembersListPage> {
               member.gymMemberID.toString().contains(searchQuery);
         }).toList();
       }
-
-      sortMembersAlphabetically(filteredMembers);
-      sortMembersByDueDate(filteredMembers);
     });
   }
 
@@ -308,10 +305,4 @@ class _MembersListPageState extends State<MembersListPage> {
   }
 }
 
-void sortMembersAlphabetically(List<GymMember> members) {
-  members.sort((a, b) => a.name.compareTo(b.name));
-}
 
-void sortMembersByDueDate(List<GymMember> members) {
-  members.sort((a, b) => a.membershipEndDate.compareTo(b.membershipEndDate));
-}

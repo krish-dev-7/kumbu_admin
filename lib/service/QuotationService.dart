@@ -10,7 +10,7 @@ class QuotationService {
     String apiUrl = '$baseUrl/api/quotations'; // Replace with your specific endpoint
     try {
       var response = await http.get(Uri.parse(apiUrl));
-      print(response.body);
+      // print(response.body);
       if (response.statusCode == 200) {
         List<dynamic> jsonList = jsonDecode(response.body);
         List<Quotation> quotations = jsonList.map((e) => Quotation.fromJson(e)).toList();
@@ -29,7 +29,20 @@ class QuotationService {
       headers: {'Content-Type': 'application/json'},
       body: json.encode({'isApproved': true}),
     );
-    print(response.body);
+    // print(response.body);
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to approve quotation');
+    }
+  }
+
+  Future<void> paidQuotation(String quotationID) async {
+    final response = await http.put(
+      Uri.parse('$baseUrl/api/quotations/$quotationID'),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({'isPaid': true}),
+    );
+    // print(response.body);
 
     if (response.statusCode != 200) {
       throw Exception('Failed to approve quotation');

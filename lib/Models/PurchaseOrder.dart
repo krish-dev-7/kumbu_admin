@@ -6,6 +6,7 @@ class PurchaseOrder {
   final DateTime membershipStartDate;
   final DateTime membershipEndDate;
   final String memberId;
+  final int gymMemberID;
 
   PurchaseOrder({
     required this.purchaseOrderId,
@@ -15,28 +16,31 @@ class PurchaseOrder {
     required this.membershipStartDate,
     required this.membershipEndDate,
     required this.memberId,
+    required this.gymMemberID
   });
 
   factory PurchaseOrder.fromMap(Map<String, dynamic> map) {
     return PurchaseOrder(
-      purchaseOrderId: map['purchaseOrderID'],
+      purchaseOrderId: map['_id'],
       timeOfPO: DateTime.parse(map['timeOfPO']),
       amountPaid: map['amountPaid'].toDouble(),
-      packageId: map['package'],
+      packageId: map["_id"],
       membershipStartDate: DateTime.parse(map['membershipStartDate']),
       membershipEndDate: DateTime.parse(map['membershipEndDate']),
-      memberId: map['memberID'],
+      gymMemberID: map['gymMemberID'], memberId: map['memberID'],
     );
   }
   Map<String, dynamic> toMap() {
     return {
       'purchaseOrderId': purchaseOrderId,
-      'timeOfPO': timeOfPO.toIso8601String(),
+      'timeOfPO': timeOfPO.toString(),
       'amountPaid': amountPaid,
-      'package': packageId,
-      'membershipStartDate': membershipStartDate.toIso8601String(),
-      'membershipEndDate': membershipEndDate.toIso8601String(),
-      'memberID': memberId,
+      'packageID': packageId,
+      'membershipStartDate': membershipStartDate.toString(),
+      'membershipEndDate': membershipEndDate.toString(),
+      'gymMemberID': gymMemberID,
+      'memberID':memberId
+
     };
   }
 }

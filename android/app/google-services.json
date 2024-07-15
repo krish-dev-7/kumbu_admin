@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "433392220122",
+    "project_id": "kumbu-4d719",
+    "storage_bucket": "kumbu-4d719.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:433392220122:android:5c955c29e8208d594732e3",
+        "android_client_info": {
+          "package_name": "com.example.kumbu_admin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "433392220122-860tt0cu6bcmcgua63kd8fvp2bq0rfev.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.kumbu_admin",
+            "certificate_hash": "bc5adf50747636eee2096f71d27fa2d89d066277"
+          }
+        },
+        {
+          "client_id": "433392220122-11ntt247ijjev6aclgp9j533f2vd46q6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCgXPvrdg11tyZ2S90k826D9ri4eY0s8UY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "433392220122-11ntt247ijjev6aclgp9j533f2vd46q6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
