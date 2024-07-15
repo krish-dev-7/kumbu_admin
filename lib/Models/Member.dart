@@ -14,22 +14,22 @@ enum MembershipLevel {
 class GymMember {
   final String id;
   final int gymMemberID;
-  final String name;
-  final int age;
-  final String gender;
-  final Package? currentPackage;
-  final String membershipDuration;
-  final DateTime membershipStartDate;
-  final DateTime membershipEndDate;
-  final MembershipLevel level;
-  final String email;
-  final String phoneNumber;
-  final String address;
-  final String? imageUrl;
+   String name;
+   int age;
+   String gender;
+   Package? currentPackage;
+   String membershipDuration;
+   DateTime membershipStartDate;
+   DateTime membershipEndDate;
+   MembershipLevel level;
+   String email;
+   String phoneNumber;
+   String address;
+   String? imageUrl;
   bool isActive;
-  final List<dynamic> purchaseOrderHistories;
-  final String dietTemplateID;
-  final int daysAttended;
+   List<dynamic> purchaseOrderHistories;
+   String dietTemplateID;
+   int daysAttended;
 
   GymMember({
     required this.id,

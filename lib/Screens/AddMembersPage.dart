@@ -283,7 +283,7 @@ class _AddMemberPageState extends State<AddMemberPage> {
           items: _packages.map((Package package) {
             return DropdownMenuItem<Package>(
               value: package,
-              child: Text('${package.level} - ${package.getReadableDuration()} - \$${package.amount}'),
+              child: Text('${package.level} - ${package.getReadableDuration()} - \₹${package.amount}'),
             );
           }).toList(),
           decoration: InputDecoration(

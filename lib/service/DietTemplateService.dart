@@ -7,7 +7,7 @@ class DietTemplateService {
   final String apiUrl = 'http://localhost:3000/api'; // Update with your API URL
 
   Future<List<DietTemplate>> fetchDietTemplates() async {
-    final response = await http.get(Uri.parse('$apiUrl/dietTemplates'));
+    final response = await http.get(Uri.parse('$apiUrl/dietTemplate'));
     if (response.statusCode == 200) {
       List<dynamic> body = jsonDecode(response.body);
       List<DietTemplate> dietTemplates = body
@@ -21,7 +21,7 @@ class DietTemplateService {
 
   Future<void> addDietTemplate(DietTemplate dietTemplate) async {
     final response = await http.post(
-      Uri.parse('$apiUrl/dietTemplates'),
+      Uri.parse('$apiUrl/dietTemplate'),
       headers: {"Content-Type": "application/json"},
       body: jsonEncode(dietTemplate.toJson()),
     );

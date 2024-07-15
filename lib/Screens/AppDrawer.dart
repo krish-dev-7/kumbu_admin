@@ -12,21 +12,33 @@ class AppDrawer extends StatelessWidget {
             decoration: BoxDecoration(
               color: appDarkGreen,
             ),
-            child: Text(
-              'Kumbu Fitness',
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Kumbu Fitness',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                  ),
+                ),
+            Text(
+              'OWNER',
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 24,
-              ),
+                fontSize: 16,
+              ),)
+              ],
             ),
           ),
-          ListTile(
-            leading: Icon(Icons.person),
-            title: Text('Profile'),
-            onTap: () {
-              Navigator.pushNamed(context, '/profile');
-            },
-          ),
+          // ListTile(
+          //   leading: Icon(Icons.person),
+          //   title: Text('Profile'),
+          //   onTap: () {
+          //     Navigator.pushNamed(context, '/profile');
+          //   },
+          // ),
           ListTile(
             leading: Icon(Icons.local_fire_department),
             title: Text('Package Page'),
@@ -35,10 +47,17 @@ class AppDrawer extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: Icon(Icons.person),
+            leading: Icon(Icons.water_drop_rounded),
             title: Text('Requests'),
             onTap: () {
               Navigator.pushNamed(context, '/requestPage');
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.currency_rupee),
+            title: Text('Income Histories'),
+            onTap: () {
+              Navigator.pushNamed(context, '/incomeHistory');
             },
           ),
           ListTile(
@@ -48,6 +67,14 @@ class AppDrawer extends StatelessWidget {
               Navigator.pushNamed(context, '/dietsPage');
             },
           ),
+          ListTile(
+            leading: Icon(Icons.list_alt),
+            title: Text('Entries'),
+            onTap: () {
+              Navigator.pushNamed(context, '/AttendancePage');
+            },
+          ),
+
         ],
       ),
     );

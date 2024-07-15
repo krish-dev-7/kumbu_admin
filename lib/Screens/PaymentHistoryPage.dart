@@ -29,7 +29,7 @@ class PaymentHistoryPage extends StatelessWidget {
               side: BorderSide(color: appLightGreen, width: 1),
             ),
             title: Text(
-              'Order ID: ${purchaseOrder.purchaseOrderId}',
+              'Amount Paid: \₹${purchaseOrder.amountPaid.toStringAsFixed(2)}',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 18,
@@ -41,14 +41,6 @@ class PaymentHistoryPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Amount Paid: \$${purchaseOrder.amountPaid.toStringAsFixed(2)}',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.white70,
-                    ),
-                  ),
-                  SizedBox(height: 4.0),
                   Text(
                     'Package ID: ${purchaseOrder.packageId}',
                     style: TextStyle(

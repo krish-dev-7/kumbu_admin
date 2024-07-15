@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:kumbu_admin/Common/ThemeData.dart';
+import 'package:kumbu_admin/service/PurchaseOrderService.dart';
 
+import '../Models/PurchaseOrder.dart';
 import '../Models/Quotation.dart';
 import '../service/QuotationService.dart';
 
@@ -125,6 +127,7 @@ class QuotationCard extends StatefulWidget {
 
 class _QuotationCardState extends State<QuotationCard> {
   final QuotationService _quotationService = QuotationService();
+  final PurchaseOrderService _purchaseOrderService = new PurchaseOrderService();
 
   void _approveQuotation() async {
     try {
@@ -142,6 +145,30 @@ class _QuotationCardState extends State<QuotationCard> {
       );
     }
   }
+
+  // void _paidQuotation() async {
+  //   try {
+  //     await _quotationService.paidQuotation(widget.quotation.quotationID);
+  //     PurchaseOrder purchaseOrder = PurchaseOrder(
+  //       memberId:"",
+  //       gymMemberID: widget.quotation.requesterID,
+  //       packageId: widget.quotation.package.packageID??"",
+  //       timeOfPO: DateTime.now(),
+  //       amountPaid: widget.quotation.package.amount, membershipStartDate: DateTime., membershipEndDate: endDate, purchaseOrderId: '',
+  //     );
+  //     await _purchaseOrderService.addPurchaseOrder(purchaseOrder)
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text('Quotation approved successfully')),
+  //     );
+  //     // Optionally, refresh the list or update the state
+  //     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>QuotationPage()));
+  //   } catch (error) {
+  //     // Handle error
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text('Failed to approve quotation: $error')),
+  //     );
+  //   }
+  // }
 
   void _rejectQuotation() async {
     try {
@@ -183,6 +210,7 @@ class _QuotationCardState extends State<QuotationCard> {
             ),
             SizedBox(height: 5),
             Text('Level: ${widget.quotation.package.level}'),
+            Text('Duration: ${widget.quotation.package.getReadableDuration()}'),
             Text('Amount: \$${widget.quotation.package.amount.toStringAsFixed(2)}'),
             Text('Phone: ${widget.quotation.requesterNumber}'),
             Text('Approved: ${widget.quotation.isApproved ? 'Yes' : 'No'}'),
@@ -218,6 +246,35 @@ class _QuotationCardState extends State<QuotationCard> {
                 ],
               ),
             ],
+            if (widget.quotation.isApproved && !widget.quotation.isPaid) ...[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: _rejectQuotation,
+                    icon: Icon(Icons.close, color: Colors.white),
+                    label: Text('Cancel', style: TextStyle(color: Colors.white)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red, // Background color
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                  ),
+                  // ElevatedButton.icon(
+                  //   onPressed: _paidQuotation,
+                  //   icon: Icon(Icons.check, color: Colors.white),
+                  //   label: Text('Paid', style: TextStyle(color: Colors.white)),
+                  //   style: ElevatedButton.styleFrom(
+                  //     backgroundColor: appDarkGreen, // Background color
+                  //     shape: RoundedRectangleBorder(
+                  //       borderRadius: BorderRadius.circular(20),
+                  //     ),
+                  //   ),
+                  // ),
+                ],
+              ),
+            ]
           ],
         ),
       ),
