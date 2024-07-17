@@ -83,22 +83,4 @@ class MemberService {
       throw Exception('Failed to update member');
     }
   }
-  Future<void> updateMembershipDetails(String memberId, String packageId,  DateTime endDate) async {
-    print("updateMembershipDetail $memberId");
-    final url = '$baseUrl/api/members/$memberId';
-    final response = await http.put(
-      Uri.parse(url),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: json.encode({
-        'currentPackageID': packageId,
-        'membershipEndDate': endDate.toIso8601String()
-      }),
-    );
-    print(response.body);
-    if (response.statusCode != 200) {
-      throw Exception('Failed to update membership details');
-    }
-  }
 }

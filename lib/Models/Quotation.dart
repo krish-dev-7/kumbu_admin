@@ -5,8 +5,7 @@ import 'Package.dart';
 class Quotation {
   final String quotationID; //_id
   final String requesterName;
-  final int requesterID; //requester Gym member ID
-  final String requesterUID; // requester _id
+  final int requesterID;
   final String requesterNumber;
   final Package package; // Nested object
   late final bool isApproved;
@@ -14,7 +13,6 @@ class Quotation {
 
   Quotation({
     required this.quotationID,
-    required this.requesterUID,
     required this.requesterName,
     required this.requesterID,
     required this.requesterNumber,
@@ -28,7 +26,6 @@ class Quotation {
       quotationID: json['_id'],
       requesterName: json['requester']['name'],
       requesterID: json['requester']['gymMemberID'],
-      requesterUID: json['requester']['_id'],
       requesterNumber: json['requester']['phoneNumber'],
       package: Package.fromJson(json['package']), // Parse package from JSON
       isApproved: json['isApproved'],
