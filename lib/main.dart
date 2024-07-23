@@ -1,3 +1,4 @@
+// import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:kumbu_admin/Common/ThemeData.dart';
 import 'package:kumbu_admin/Screens/AttendancePage.dart';
@@ -9,8 +10,15 @@ import 'Models/Member.dart';
 import 'Screens/MembersListPage.dart';
 import 'Screens/PackagePage.dart';
 import 'Screens/ProfilePage.dart';
+import 'Screens/workouts/WokoutTemplateListScreen.dart';
+import 'firebase_options.dart';
 
-void main() {
+void main()  {
+  // WidgetsFlutterBinding.ensureInitialized();
+  // // FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  // await Firebase.initializeApp(
+  //   options: DefaultFirebaseOptions.currentPlatform,
+  // );
 
   runApp(MaterialApp(
     theme: appTheme,
@@ -22,6 +30,7 @@ void main() {
       '/profile': (context) => ProfilePage(),
       '/requestPage': (context) => QuotationPage(),
       '/dietsPage': (context) => DietTemplatesPage(),
+      '/workoutPage': (context) => WorkoutTemplateListScreen(),
       '/incomeHistory': (context) => GlobalPaymentHistoryPage(),
       '/AttendancePage': (context) => AttendancePage()
     },

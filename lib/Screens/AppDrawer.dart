@@ -68,6 +68,13 @@ class AppDrawer extends StatelessWidget {
             },
           ),
           ListTile(
+            leading: Icon(Icons.crisis_alert),
+            title: Text('Workouts'),
+            onTap: () {
+              Navigator.pushNamed(context, '/workoutPage');
+            },
+          ),
+          ListTile(
             leading: Icon(Icons.list_alt),
             title: Text('Entries'),
             onTap: () {

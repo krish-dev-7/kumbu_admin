@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import '../Models/Diet.dart';
 
 class DietService {
-  final String apiUrl = 'http://localhost:3000/api/diets'; // Update with your API URL
+  final String apiUrl = 'https://kumbubackend.onrender.com/api/diets'; // Update with your API URL
 
   Future<List<Diet>> getAllDiets() async {
     final response = await http.get(Uri.parse(apiUrl));

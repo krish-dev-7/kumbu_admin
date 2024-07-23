@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import '../Models/PurchaseOrder.dart'; // Update with your PurchaseOrder model path
 
 class PurchaseOrderService {
-  static const String baseUrl = 'http://localhost:3000/api'; // Update with your API base URL
+  static const String baseUrl = 'https://kumbubackend.onrender.com/api'; // Update with your API base URL
 
   Future<List<PurchaseOrder>> fetchAllPurchaseOrders() async {
     try {

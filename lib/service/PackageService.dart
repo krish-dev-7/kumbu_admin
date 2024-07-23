@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import '../Models/Package.dart';
 
 class PackageService {
-  static const String baseUrl = 'http://127.0.0.1:3000'; // Replace with your API base URL
+  static const String baseUrl = 'https://kumbubackend.onrender.com'; // Replace with your API base URL
 
   Future<List<Package>> getPackages() async {
     String apiUrl = '$baseUrl/api/packages'; // Replace with your specific endpoint

@@ -1,42 +1,85 @@
 {
   "project_info": {
-    "project_number": "433392220122",
-    "project_id": "kumbu-4d719",
-    "storage_bucket": "kumbu-4d719.appspot.com"
+    "project_number": "84765251346",
+    "project_id": "kumbu-server",
+    "storage_bucket": "kumbu-server.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:433392220122:android:5c955c29e8208d594732e3",
+        "mobilesdk_app_id": "1:84765251346:android:5ab811c9f6ff15910785cb",
         "android_client_info": {
           "package_name": "com.example.kumbu_admin"
         }
       },
       "oauth_client": [
         {
-          "client_id": "433392220122-860tt0cu6bcmcgua63kd8fvp2bq0rfev.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.kumbu_admin",
-            "certificate_hash": "bc5adf50747636eee2096f71d27fa2d89d066277"
-          }
-        },
-        {
-          "client_id": "433392220122-11ntt247ijjev6aclgp9j533f2vd46q6.apps.googleusercontent.com",
+          "client_id": "84765251346-gp7hsnhgucffpm0a6o5beik3pj5a9o45.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCgXPvrdg11tyZ2S90k826D9ri4eY0s8UY"
+          "current_key": "AIzaSyC1gN-P2zhYLH0SneolEw3Kv-IJyzKQHEA"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "433392220122-11ntt247ijjev6aclgp9j533f2vd46q6.apps.googleusercontent.com",
+              "client_id": "84765251346-gp7hsnhgucffpm0a6o5beik3pj5a9o45.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "84765251346-3o94d4m7hm68jcucodsr9d66fu8gm8ss.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.kumbumember"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:84765251346:android:3173c1efcc5866920785cb",
+        "android_client_info": {
+          "package_name": "com.example.kumbumember"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "84765251346-sjmndesqautddegan1iue8qci5ostojl.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.kumbumember",
+            "certificate_hash": "5258f2a4731299fa597a0e34afaad8a7ddde0d27"
+          }
+        },
+        {
+          "client_id": "84765251346-gp7hsnhgucffpm0a6o5beik3pj5a9o45.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC1gN-P2zhYLH0SneolEw3Kv-IJyzKQHEA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "84765251346-gp7hsnhgucffpm0a6o5beik3pj5a9o45.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "84765251346-3o94d4m7hm68jcucodsr9d66fu8gm8ss.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.kumbumember"
+              }
             }
           ]
         }

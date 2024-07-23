@@ -27,9 +27,11 @@ class Attendance {
       memberId: json['member']['_id'],
       gymMemberId: json['member']['gymMemberID'],
       memberName: json['member']['name'],
-      memberNumber: json['member']['phoneNumber'],
-      membershipDuration: json['member']['membershipDuration'],
-      membershipEndDate: DateTime.parse(json['member']['membershipEndDate']),
+      memberNumber: json['member']['phoneNumber'] ??"", //will get null on getAttendanceByMember,
+      membershipDuration: json['member']['membershipDuration'] ??"",
+      membershipEndDate: json['member']['membershipEndDate'] != null
+          ? DateTime.parse(json['member']['membershipEndDate'])
+          : DateTime.now(),
     );
   }
 }

@@ -107,7 +107,7 @@ class GymMember {
       name: map['name'],
       age: map['age'],
       gender: map['gender'],
-      currentPackage: Package.fromJson(map['currentPackageID']),
+      currentPackage: map['currentPackageID']!=null?Package.fromJson(map['currentPackageID']):null,
       membershipDuration: map['membershipDuration'],
       membershipStartDate: DateTime.parse(map['membershipStartDate']),
       membershipEndDate: DateTime.parse(map['membershipEndDate']),

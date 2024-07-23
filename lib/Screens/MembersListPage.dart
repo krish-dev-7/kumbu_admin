@@ -9,7 +9,6 @@ import 'MembersDetailsPage.dart';
 enum MemberFilter { all, active, inactive }
 
 class MembersListPage extends StatefulWidget {
-
   @override
   _MembersListPageState createState() => _MembersListPageState();
 }
@@ -20,6 +19,8 @@ class _MembersListPageState extends State<MembersListPage> {
   List<GymMember> filteredMembers = [];
   MemberFilter _selectedFilter = MemberFilter.all;
   String searchQuery = "";
+  int currentPage = 1;
+  int totalPages = 1;
 
   @override
   void initState() {
@@ -40,22 +41,20 @@ class _MembersListPageState extends State<MembersListPage> {
             return true;
         }
       }).toList();
-
-      if (searchQuery.isNotEmpty) {
-        filteredMembers = filteredMembers.where((member) {
-          return member.name.toLowerCase().contains(searchQuery.toLowerCase()) ||
-              member.gymMemberID.toString().contains(searchQuery);
-        }).toList();
-      }
     });
   }
 
-  Future<void> _fetchMembers() async {
+  Future<void> _fetchMembers({int page = 1, String search = ''}) async {
+    setState(() {
+      _isLoading = true;
+    });
     try {
       MemberService memberService = MemberService();
-      List<GymMember> memberList = await memberService.getAllMembers();
+      final result = await memberService.getMembers(page: page, search: search);
       setState(() {
-        _members = memberList;
+        _members = result.members;
+        currentPage = result.currentPage;
+        totalPages = result.totalPages;
         _isLoading = false;
       });
       _updateFilteredMembers();
@@ -64,6 +63,18 @@ class _MembersListPageState extends State<MembersListPage> {
       setState(() {
         _isLoading = false;
       });
+    }
+  }
+
+  void _nextPage() {
+    if (currentPage < totalPages) {
+      _fetchMembers(page: currentPage + 1, search: searchQuery);
+    }
+  }
+
+  void _previousPage() {
+    if (currentPage > 1) {
+      _fetchMembers(page: currentPage - 1, search: searchQuery);
     }
   }
 
@@ -76,7 +87,7 @@ class _MembersListPageState extends State<MembersListPage> {
       drawer: AppDrawer(),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
-          :Column(
+          : Column(
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -89,9 +100,9 @@ class _MembersListPageState extends State<MembersListPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                     Text(
+                    Text(
                       "Members: ",
-                      style: TextStyle(fontWeight: FontWeight.bold,  color: appLightGreen),
+                      style: TextStyle(fontWeight: FontWeight.bold, color: appLightGreen),
                     ),
                     const SizedBox(width: 10),
                     _buildRadioButton('All', MemberFilter.all),
@@ -118,10 +129,10 @@ class _MembersListPageState extends State<MembersListPage> {
                 ),
                 prefixIcon: Icon(Icons.search),
               ),
-              onChanged: (value) {
+              onSubmitted: (value) {
                 setState(() {
                   searchQuery = value;
-                  _updateFilteredMembers();
+                  _fetchMembers(search: searchQuery);
                 });
               },
             ),
@@ -130,9 +141,6 @@ class _MembersListPageState extends State<MembersListPage> {
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Container(
-                decoration: BoxDecoration(
-                  // border: Border.all(color: Colors.white, width: 1),
-                ),
                 child: LayoutBuilder(
                   builder: (context, constraints) {
                     int crossAxisCount = constraints.maxWidth > 600 ? 3 : 1;
@@ -220,10 +228,10 @@ class _MembersListPageState extends State<MembersListPage> {
                                               const SizedBox(height: 4),
                                               Row(
                                                 children: [
-                                                  Icon(Icons.access_time, color: appLightGreen, size: 14),
+                                                  Icon(Icons.fitness_center, color: appLightGreen, size: 14),
                                                   const SizedBox(width: 8),
                                                   Text(
-                                                    '${member.getMembershipDuration()}',
+                                                    member.level.toString().split('.').last,
                                                     style: TextStyle(
                                                       color: Colors.white70,
                                                     ),
@@ -238,25 +246,13 @@ class _MembersListPageState extends State<MembersListPage> {
                                   ),
                                 ),
                               ),
-                              if (!member.isActive)
-                                Positioned.fill(
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey.withOpacity(0.6),
-                                      borderRadius: BorderRadius.circular(12)
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        'Expired',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 18,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
+                              Positioned(
+                                top: 4,
+                                right: 4,
+                                child: member.isActive
+                                    ? Icon(Icons.check_circle, color: appLightGreen)
+                                    : Icon(Icons.cancel, color: Colors.red),
+                              ),
                             ],
                           ),
                         );
@@ -267,42 +263,60 @@ class _MembersListPageState extends State<MembersListPage> {
               ),
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                ElevatedButton(
+                  onPressed: _previousPage,
+                  child: Text('Previous'),
+                ),
+                Text('Page $currentPage of $totalPages'),
+                ElevatedButton(
+                  onPressed: _nextPage,
+                  child: Text('Next'),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => AddMemberPage()),
+            MaterialPageRoute(
+              builder: (context) => AddMemberPage(),
+            ),
           );
         },
-        child: const Icon(
-          Icons.add,
-          color: Colors.white,
-        ),
-        backgroundColor: appDarkGreen,
+        child: Icon(Icons.add),
       ),
     );
   }
 
-  Widget _buildRadioButton(String title, MemberFilter value) {
+  Widget _buildRadioButton(String title, MemberFilter filter) {
     return Row(
       children: [
         Radio<MemberFilter>(
-          value: value,
+          value: filter,
           groupValue: _selectedFilter,
-          onChanged: (MemberFilter? newValue) {
+          onChanged: (MemberFilter? value) {
             setState(() {
-              _selectedFilter = newValue!;
+              _selectedFilter = value!;
               _updateFilteredMembers();
             });
           },
           activeColor: appLightGreen,
         ),
-        Text(title, style: const TextStyle(color: Colors.white)),
+        Text(
+          title,
+          style: TextStyle(
+            color: Colors.white,
+          ),
+        ),
       ],
     );
   }
 }
-
-

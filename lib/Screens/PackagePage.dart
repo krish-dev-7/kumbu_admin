@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kumbu_admin/Common/ThemeData.dart';
+import '../Models/Member.dart';
 import '../Models/Package.dart';
 import '../service/PackageService.dart';
 import 'PackageListPage.dart';
@@ -29,7 +30,7 @@ class _PackagePageState extends State<PackagePage> {
   void _submitForm() async {
     if (_formKey.currentState!.validate()) {
       final newPackage = Package(
-        packageID: _packageIDController.text,
+        packageID: "",
         packageDuration: int.parse(_packageDurationController.text),
         level: _levelController.text,
         amount: double.parse(_amountController.text),
@@ -64,28 +65,28 @@ class _PackagePageState extends State<PackagePage> {
           key: _formKey,
           child: ListView(
             children: <Widget>[
-              TextFormField(
-                controller: _packageIDController,
-                decoration: InputDecoration(
-                  labelText: 'Package ID',
-                  // labelStyle: TextStyle(color: Colors.black87, fontSize: 16),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                      borderSide: BorderSide(color: appLightGreen, width: 2.0),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: appLightGreen, width: 2.0),
-                  ),
-                  filled: true,
-                  fillColor: Colors.white10,
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a Package ID';
-                  }
-                  return null;
-                },
-              ),
+              // TextFormField(
+              //   controller: _packageIDController,
+              //   decoration: InputDecoration(
+              //     labelText: 'Package ID',
+              //     // labelStyle: TextStyle(color: Colors.black87, fontSize: 16),
+              //     border: OutlineInputBorder(
+              //       borderRadius: BorderRadius.circular(10.0),
+              //         borderSide: BorderSide(color: appLightGreen, width: 2.0),
+              //     ),
+              //     focusedBorder: OutlineInputBorder(
+              //       borderSide: BorderSide(color: appLightGreen, width: 2.0),
+              //     ),
+              //     filled: true,
+              //     fillColor: Colors.white10,
+              //   ),
+              //   validator: (value) {
+              //     if (value == null || value.isEmpty) {
+              //       return 'Please enter a Package ID';
+              //     }
+              //     return null;
+              //   },
+              // ),
 
               SizedBox(height: 16),
 
@@ -134,6 +135,14 @@ class _PackagePageState extends State<PackagePage> {
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter a Level';
+                  }
+                  else {
+                    // Check if the value exists in MembershipLevel enum values
+                    bool isValid = MembershipLevel.values.any((level) => level.toString().split('.').last == value.toUpperCase());
+
+                    if (!isValid) {
+                      return 'Invalid membership level';
+                    }
                   }
                   return null;
                 },

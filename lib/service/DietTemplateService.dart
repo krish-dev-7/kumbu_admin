@@ -4,7 +4,7 @@ import 'dart:convert';
 import '../Models/DietTemplate.dart';
 
 class DietTemplateService {
-  final String apiUrl = 'http://localhost:3000/api'; // Update with your API URL
+  final String apiUrl = 'https://kumbubackend.onrender.com/api'; // Update with your API URL
 
   Future<List<DietTemplate>> fetchDietTemplates() async {
     final response = await http.get(Uri.parse('$apiUrl/dietTemplate'));
@@ -28,6 +28,18 @@ class DietTemplateService {
 
     if (response.statusCode != 201) {
       throw Exception('Failed to add diet template');
+    }
+  }
+
+  Future<void> deleteDietTemplate(String dietTemplateId) async {
+    final response = await http.delete(
+      Uri.parse('$apiUrl/dietTemplate/$dietTemplateId'),
+      headers: {"Content-Type": "application/json"},
+    );
+
+    print(response.body);
+    if (response.statusCode != 200) {
+      throw Exception('Failed to delete diet template');
     }
   }
 }

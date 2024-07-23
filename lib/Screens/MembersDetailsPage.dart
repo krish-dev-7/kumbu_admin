@@ -1,13 +1,20 @@
+import 'dart:io';
+
+// import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:kumbu_admin/Screens/MembersAttendancePage.dart';
 import 'package:kumbu_admin/service/DietTemplateService.dart';
 import '../Models/DietTemplate.dart';
 import '../Models/Member.dart'; // Update path as per your project structure
 import 'package:kumbu_admin/Common/ThemeData.dart';
 import '../Models/Package.dart';
 import '../Models/PurchaseOrder.dart';
+import '../Models/WorkoutTemplate.dart';
 import '../service/PackageService.dart';
 import '../service/PurchaseOrderService.dart';
+import '../service/WorkoutTemplateService.dart';
 import 'PaymentHistoryPage.dart'; // Import the new page
 import '../service/MemberService.dart'; // Import MemberService
 
@@ -22,10 +29,15 @@ class MemberDetailsPage extends StatefulWidget {
 
 class _MemberDetailsPageState extends State<MemberDetailsPage> {
   MemberService _memberService = MemberService();
+  final WorkoutTemplateService _workoutService = WorkoutTemplateService();
   late List<DietTemplate> _dietTemplates = [];
   String? _selectedDietTemplateId;
   bool _isEditing = false;
   List<Package> _packages = [];
+  MembershipLevel? _selectedLevel;
+  File? _image;
+  get data => null;
+
 
   // Controllers for editable fields
   late TextEditingController _nameController;
@@ -44,10 +56,13 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
     super.initState();
     _fetchDietTemplates();
     _fetchPackages();
+    _fetchWorkoutTemplates();
+
 
 
     // Initialize controllers with existing member data
     _nameController = TextEditingController(text: widget.member.name);
+    _selectedLevel = widget.member.level;
     _ageController = TextEditingController(text: widget.member.age.toString());
     _genderController = TextEditingController(text: widget.member.gender);
     _emailController = TextEditingController(text: widget.member.email);
@@ -69,6 +84,33 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
     }
   }
 
+  Future<void> _fetchWorkoutTemplates() async {
+    try {
+      List<WorkoutTemplate> workoutTemplates = await _workoutService.fetchWorkoutTemplates();
+      setState(() {
+        _workoutTemplates = workoutTemplates;
+      });
+    } catch (e) {
+      print('Failed to fetch diet templates: $e');
+    }
+  }
+
+  String? _selectedWorkoutTemplateId;
+  List<WorkoutTemplate> _workoutTemplates = [];
+
+
+
+  void _assignWorkoutTemplate() async {
+    if (_selectedWorkoutTemplateId != null) {
+      try {
+        await _workoutService.assignWorkoutTemplate(widget.member.id, _selectedWorkoutTemplateId!);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Workout Template Assigned')));
+      } catch (error) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to assign workout template: $error')));
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -87,15 +129,35 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Center(
-                child: CircleAvatar(
-                  radius: 60,
-                  backgroundImage: widget.member.imageUrl != null
-                      ? NetworkImage(widget.member.imageUrl!)
-                      : null,
-                  child: widget.member.imageUrl == null
-                      ? Icon(Icons.account_circle, size: 60)
-                      : null,
+              Container(
+                height: 150,
+                width: 300,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.black),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Center(
+                          child: _image == null
+                              ? Text('No image selected.')
+                              : Image.file(_image!),
+                        ),
+                      ),
+                      ElevatedButton(
+                        onPressed: () async {
+                          final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+                          if (image != null) {
+                            _image = File(image.path);
+                          }
+                        },
+                        child: Text('Select image'),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               SizedBox(height: 16),
@@ -107,20 +169,42 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
                   _buildSection(context, 'Membership Details', _buildMembershipDetailsTable()),
                   _buildSection(context, 'Package Details', _buildPackageDetails()),
                   _buildSection(context, 'Diet Assignment', _buildDietAssignmentSection()),
+                  _buildSection(context, 'Workout Assignment', _buildWorkoutAssignmentSection()),
                 ],
               ),
               SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => PaymentHistoryPage(member: widget.member),
+              Container(
+                width: MediaQuery.of(context).size.width,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PaymentHistoryPage(member: widget.member),
+                          ),
+                        );
+                      },
+                      child: Text('View Payment History', style: TextStyle(color: Colors.white)),
+                      style: ElevatedButton.styleFrom(backgroundColor: appLightGreen),
                     ),
-                  );
-                },
-                child: Text('View Payment History', style: TextStyle(color: Colors.white)),
-                style: ElevatedButton.styleFrom(backgroundColor: appLightGreen),
+                    SizedBox(width: 10,),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => MemberAttendancePage(memberId: widget.member.id),
+                          ),
+                        );
+                      },
+                      child: Text('View Attendance History', style: TextStyle(color: Colors.white)),
+                      style: ElevatedButton.styleFrom(backgroundColor: appLightGreen),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -161,6 +245,7 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
   Widget _buildPersonalInfoTable() {
     return _buildDetailTable([
       _buildEditableDetailRow(Icons.person, 'Name', _nameController),
+      _buildEditableLevelRow(Icons.star, 'User Level'),
       _buildEditableDetailRow(Icons.cake, 'Age', _ageController, isNumber: true),
       _buildEditableDetailRow(Icons.wc, 'Gender', _genderController),
       _buildEditableDetailRow(Icons.email, 'Email', _emailController),
@@ -185,6 +270,45 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
         _buildDetailRow(Icons.calendar_today, 'Membership End Date', _formatDate(widget.member.membershipEndDate)),
       ]);
     }
+  }
+  Widget _buildEditableLevelRow(IconData icon, String label) {
+    return Row(
+      children: [
+        Icon(icon, color: appLightGreen),
+        SizedBox(width: 8),
+        Text(
+          '$label: ',
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        ),
+        (_isEditing)?Expanded(
+          child: DropdownButtonFormField<MembershipLevel>(
+            value: _selectedLevel,
+            decoration: InputDecoration(
+              border: OutlineInputBorder(
+                borderSide: BorderSide(color: appLightGreen),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: appLightGreen),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: appLightGreen),
+              ),
+              fillColor: Colors.white10,),
+            items: MembershipLevel.values.map((MembershipLevel level) {
+              return DropdownMenuItem<MembershipLevel>(
+                value: level,
+                child: Text(level.toString().split('.').last),
+              );
+            }).toList(),
+            onChanged: (value) {
+              setState(() {
+                _selectedLevel = value;
+              });
+            },
+          ),
+        ):Text(widget.member.level.name),
+      ],
+    );
   }
 
   Widget _buildDatePickerRow(IconData icon, String label, TextEditingController controller) {
@@ -347,6 +471,7 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
                   borderRadius: BorderRadius.circular(8.0),
                   borderSide: BorderSide(color: appLightGreen, width: 1.0),
                 ),
+                fillColor: Colors.white10
               ),
               style: TextStyle(color: Colors.white70),
             )
@@ -439,6 +564,78 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
       ],
     );
   }
+  Widget _buildWorkoutAssignmentSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        DropdownButtonFormField<String>(
+          decoration: InputDecoration(
+            labelText: 'Select Workout Template',
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8.0),
+              borderSide: BorderSide(color: appLightGreen, width: 1.0),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8.0),
+              borderSide: BorderSide(color: appLightGreen, width: 1.0),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8.0),
+              borderSide: BorderSide(color: appLightGreen, width: 1.0),
+            ),
+          ),
+          value: _selectedWorkoutTemplateId,
+          onChanged: (newValue) {
+            setState(() {
+              _selectedWorkoutTemplateId = newValue;
+            });
+          },
+          items: _workoutTemplates.map((template) {
+            return DropdownMenuItem<String>(
+              value: template.id,
+              child: Text(template.templateName),
+            );
+          }).toList(),
+        ),
+        SizedBox(height: 16),
+        Text(
+          'Selected Workout template:',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: appLightGreen,
+          ),
+        ),
+        SizedBox(height: 8),
+        // if (_isEditing)
+        ElevatedButton(
+          onPressed: () async {
+            if (_selectedWorkoutTemplateId != null) {
+              try {
+                await _workoutService.assignWorkoutTemplate(widget.member.id, _selectedWorkoutTemplateId!);
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text('Workout assigned successfully'),
+                  backgroundColor: Colors.green,
+                ));
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text('Failed to assign workout template: $e'),
+                  backgroundColor: Colors.red,
+                ));
+              }
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text('Please select a workout template'),
+                backgroundColor: Colors.orange,
+              ));
+            }
+          },
+          child: Text('Assign Workouts', style: TextStyle(color: Colors.white)),
+          style: ElevatedButton.styleFrom(backgroundColor: appLightGreen),
+        ),
+      ],
+    );
+  }
   Future<void> _fetchPackages() async {
     try {
       PackageService packageService = PackageService();
@@ -461,8 +658,15 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
   void _saveChanges() async {
     // Save the changes to the member details
     try {
+      // var imageName = DateTime.now().millisecondsSinceEpoch.toString();
+      // var storageRef = FirebaseStorage.instance.ref().child('driver_images/$imageName.jpg');
+      // var uploadTask = storageRef.putFile(_image!);
+      // var downloadUrl = await (await uploadTask).ref.getDownloadURL();
+
+      // widget.member.imageUrl=downloadUrl;
       // Update the member object with new details
       widget.member.name = _nameController.text;
+      widget.member.level= _selectedLevel ?? widget.member.level;
       widget.member.age = int.parse(_ageController.text);
       widget.member.gender = _genderController.text;
       widget.member.email = _emailController.text;
@@ -472,10 +676,7 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
       widget.member.membershipEndDate = DateTime.parse(_membershipEndDateController.text);
 
       // Check if package is changed
-      bool packageChanged = _selectedPackage?.packageID != widget.member.currentPackage?.packageID;
-      print(packageChanged);
-      print(_selectedPackage?.packageID);
-      print(widget.member.currentPackage?.packageID);
+      bool packageChanged = _selectedPackage!=null;
       widget.member.currentPackage = _selectedPackage ?? widget.member.currentPackage;
 
       if (packageChanged) {

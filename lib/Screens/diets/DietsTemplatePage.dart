@@ -21,6 +21,17 @@ class _DietTemplatesPageState extends State<DietTemplatesPage> {
     _futureDietTemplates = _dietTemplateService.fetchDietTemplates();
   }
 
+  void _deleteDietTemplate(String dietTemplateId) async {
+    try {
+      await _dietTemplateService.deleteDietTemplate(dietTemplateId);
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>DietTemplatesPage()));
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Failed to delete diet template: $e'),
+      ));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,9 +56,19 @@ class _DietTemplatesPageState extends State<DietTemplatesPage> {
                   elevation: 2,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8.0),
-                    side: BorderSide(color: appLightGreen, width: 1.0), // Border color and width
+                    side: BorderSide(color: appLightGreen, width: 1.0),
                   ),
-                  child: InkWell(
+                  child: ListTile(
+                    title: Center(
+                      child: Text(
+                        dietTemplates[index].templateName,
+                        style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    trailing: IconButton(
+                      icon: Icon(Icons.delete, color: Colors.red),
+                      onPressed: () => _deleteDietTemplate(dietTemplates[index].templateID),
+                    ),
                     onTap: () {
                       Navigator.push(
                         context,
@@ -56,15 +77,6 @@ class _DietTemplatesPageState extends State<DietTemplatesPage> {
                         ),
                       );
                     },
-                    child: Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: Center(
-                        child: Text(
-                          dietTemplates[index].templateName,
-                          style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ),
                   ),
                 );
 
