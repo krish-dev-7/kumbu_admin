@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:kumbu_admin/Common/config.dart';
 import 'package:kumbu_admin/Screens/MembersAttendancePage.dart';
 import 'package:kumbu_admin/service/DietTemplateService.dart';
 import '../Models/DietTemplate.dart';
@@ -650,6 +651,9 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
   }
 
   void _toggleEditing() {
+    if(user?.role=="Trainer"){
+      return;
+    }
     setState(() {
       _isEditing = !_isEditing;
     });

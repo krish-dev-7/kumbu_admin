@@ -1,11 +1,12 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:kumbu_admin/Common/Constants.dart';
 import '../../Models/Member.dart';
 import '../Models/MemberResponse.dart';
 
 class MemberService {
-  // static const String baseUrl = 'https://kumbubackend.onrender.com'; // Replace with your API base URL
-  static const String baseUrl = 'http://localhost:3000'; // Replace with your API base URL
+  static String baseUrl = "${BASE_URL}"; // Replace with your API base URL
+  // static const String baseUrl = 'http://localhost:3000'; // Replace with your API base URL
 
   Future<void> addMember(GymMember newMember) async {
     String apiUrl = '$baseUrl/api/members'; // Replace with your specific endpoint

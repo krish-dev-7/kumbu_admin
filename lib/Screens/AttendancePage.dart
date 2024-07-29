@@ -131,14 +131,14 @@ class _AttendancePageState extends State<AttendancePage> {
                         DataCell(Container(
                           width: 120,
                           child: Text(
-                            DateFormat('hh:mm a').format(attendance.entry.toLocal()),
+                            DateFormat('hh:mm a').format(attendance.entry),
                             style: TextStyle(fontSize: 16),
                           ),
                         )),
                         DataCell(Container(
                           width: 120,
                           child: Text(
-                            attendance.exit != null ? DateFormat('hh:mm a').format(attendance.exit!.toLocal()) : '-',
+                            attendance.exit != null ? DateFormat('hh:mm a').format(attendance.exit!) : '-',
                             style: TextStyle(fontSize: 16),
                           ),
                         )),
@@ -157,7 +157,8 @@ class _AttendancePageState extends State<AttendancePage> {
                     );
                   }).toList(),
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
+                    border: Border.all(color: appLightGreen),
+                    borderRadius: BorderRadius.circular(16)
                   ),
                 ),
               ),
