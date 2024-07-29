@@ -81,7 +81,8 @@ class _MembershipRequestsPageState extends State<MembershipRequestsPage> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
+            print(snapshot.error);
+            return Center(child: Text('Contact tech team '));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return Center(child: Text('No membership requests found'));
           } else {
@@ -96,12 +97,14 @@ class _MembershipRequestsPageState extends State<MembershipRequestsPage> {
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('name: ${request.name}'),
                         Text('Phone: ${request.phoneNumber}'),
                         Text('Package duration: ${request.currentPackageID?.getReadableDuration()}'),
                         Text('Start Date: ${request.membershipStartDate.toLocal()}'),
                         Text('End Date: ${request.membershipEndDate.toLocal()}'),
-                        Text('Amount: ${request.currentPackageID?.amount}',style: TextStyle(color: appLightGreen),)
+                        Text('Amount: ${request.currentPackageID?.amount}',style: TextStyle(color: appLightGreen),),
+                        Text('Requester Name: ${request.requesterName}'),
+                        Text('Time of Request: ${request.requestedDate.toLocal()}'),
+
                       ],
                     ),
                     trailing: Row(

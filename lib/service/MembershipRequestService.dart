@@ -8,6 +8,7 @@ class MembershipRequestService{
   final baseUrl= "${BASE_URL}/api";
   Future<List<MembershipRequest>> getAllMembershipRequests() async {
     final response = await http.get(Uri.parse('$baseUrl/membershipRequests'));
+    print("membershipRequestService@11 ${response.body}");
     if (response.statusCode == 200) {
       final List<dynamic> jsonData = json.decode(response.body);
       return jsonData.map((json) => MembershipRequest.fromJson(json)).toList();
@@ -31,6 +32,7 @@ class MembershipRequestService{
       headers: {'Content-Type': 'application/json'},
       body: json.encode(request.toJson()),
     );
+    print(response.body);
     if (response.statusCode == 201) {
       return MembershipRequest.fromJson(json.decode(response.body));
     } else {
@@ -60,6 +62,7 @@ class MembershipRequestService{
 
   Future<void> approveRequest(String id) async {
     final response = await http.post(Uri.parse('$baseUrl/membershipRequests/$id/approve'));
+    print("MembershipRequestService @65 ${response.body}");
     if (response.statusCode != 200) {
       throw Exception('Failed to approve membership request');
     }

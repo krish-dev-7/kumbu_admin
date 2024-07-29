@@ -81,6 +81,13 @@ class AppDrawer extends StatelessWidget {
               Navigator.pushNamed(context, '/AttendancePage');
             },
           ),
+          ListTile(
+            leading: Icon(Icons.list_alt),
+            title: Text('Membership requests'),
+            onTap: () {
+              Navigator.pushNamed(context, '/MembershipRequestPage');
+            },
+          ),
 
         ],
       ),

@@ -6,6 +6,7 @@ import 'Package.dart';
 class MembershipRequest {
   final String? id;
   final String requesterID;
+  final String requesterName;
   final DateTime requestedDate;
   final String name;
   final int age;
@@ -24,6 +25,7 @@ class MembershipRequest {
   MembershipRequest({
     this.id,
     required this.requesterID,
+    required this.requesterName,
     required this.requestedDate,
     required this.name,
     required this.age,
@@ -48,7 +50,7 @@ class MembershipRequest {
       name: json['name'],
       age: json['age'],
       gender: json['gender'],
-      currentPackageID: json['currentPackageID'],
+      currentPackageID: json['currentPackageID']!=null?Package.fromJson(json['currentPackageID']):null,
       membershipDuration: json['membershipDuration'],
       membershipStartDate: DateTime.parse(json['membershipStartDate']),
       membershipEndDate: DateTime.parse(json['membershipEndDate']),
@@ -57,11 +59,11 @@ class MembershipRequest {
       phoneNumber: json['phoneNumber'],
       address: json['address'],
       purchaseOrderHistories: List<String>.from(json['purchaseOrderHistories']),
-      isApproved: json['isApproved'],
+      isApproved: json['isApproved'], requesterName: json['requesterName'],
     );
   }
 
-  factory MembershipRequest.fromGymMember(GymMember member, String requesterID){
+  factory MembershipRequest.fromGymMember(GymMember member, String requesterID, String requesterName){
     return MembershipRequest(
       name: member.name,
       age: member.age,
@@ -75,6 +77,7 @@ class MembershipRequest {
       currentPackageID: member.currentPackage, // Assign selected package
       level: member.level.name, // Example: Set membership level
       requesterID: requesterID, requestedDate: DateTime.now(), isApproved: false,
+      requesterName: requesterName
       );
   }
 
@@ -82,11 +85,12 @@ class MembershipRequest {
     return {
       '_id': id,
       'requesterID': requesterID,
+      'requesterName': requesterName,
       'requestedDate': requestedDate.toIso8601String(),
       'name': name,
       'age': age,
       'gender': gender,
-      'currentPackageID': currentPackageID,
+      'currentPackageID': currentPackageID?.packageID,
       'membershipDuration': membershipDuration,
       'membershipStartDate': membershipStartDate.toIso8601String(),
       'membershipEndDate': membershipEndDate.toIso8601String(),

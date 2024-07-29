@@ -22,7 +22,6 @@ class UserService {
   Future<User> getUserById(String id) async {
     final response = await http.get(Uri.parse('$baseUrl/users/$id'));
     if (response.statusCode == 200) {
-      user = User.fromJson(json.decode(response.body));
       return user!;
     } else {
       throw Exception('Failed to load user');
@@ -65,8 +64,10 @@ class UserService {
   Future<User?> getUserByEmail(String email) async {
     final url = '$baseUrl/users/email/$email';
     final response = await http.get(Uri.parse(url));
+
     if (response.statusCode == 200) {
-      return User.fromJson(json.decode(response.body));
+      user = User.fromJson(json.decode(response.body));
+      return user;
     } else {
       return null;
     }

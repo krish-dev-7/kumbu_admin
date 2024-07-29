@@ -14,15 +14,16 @@ import 'Screens/PackagePage.dart';
 import 'Screens/ProfilePage.dart';
 import 'Screens/workouts/WokoutTemplateListScreen.dart';
 import 'firebase_options.dart';
+import 'Screens/MembershipRequestPage.dart';
 
-void main()  {
+void main()  async {
   // WidgetsFlutterBinding.ensureInitialized();
   // // FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   // await Firebase.initializeApp(
   //   options: DefaultFirebaseOptions.currentPlatform,
   // );
 
-  UserService().getUserByEmail("krish0cyber@gmail.com");
+  await UserService().getUserByEmail("krish0cyber@gmail.com");
 
   print("USER : ${user?.name}");
 
@@ -39,7 +40,8 @@ void main()  {
       '/dietsPage': (context) => DietTemplatesPage(),
       '/workoutPage': (context) => WorkoutTemplateListScreen(),
       '/incomeHistory': (context) => GlobalPaymentHistoryPage(),
-      '/AttendancePage': (context) => AttendancePage()
+      '/AttendancePage': (context) => AttendancePage(),
+      '/MembershipRequestPage': (context) => MembershipRequestsPage()
     },
   ));
 }

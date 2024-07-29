@@ -32,6 +32,18 @@ class _AddMemberPageState extends State<AddMemberPage> {
   final TextEditingController membershipEndDateController = TextEditingController();
   final TextEditingController packageController = TextEditingController();
 
+  void initializeControllersForTesting(){
+    imageUrlController.text="";
+    nameController.text="name";
+    ageController.text="29";
+    genderController.text="Male";
+    emailController.text="test@test.com";
+    phoneNumberController.text="0398203982";
+    addressController.text="test address";
+    membershipStartDateController.text="2024-07-29";
+    membershipEndDateController.text="2024-08-29";
+  }
+
   File? _image;
   final picker = ImagePicker();
   final MemberService _memberService = MemberService();
@@ -54,6 +66,7 @@ class _AddMemberPageState extends State<AddMemberPage> {
   void initState() {
     super.initState();
     _fetchPackages();
+    initializeControllersForTesting();// todo: Remove after testing
   }
 
   Future<void> _fetchPackages() async {
@@ -385,10 +398,10 @@ class _AddMemberPageState extends State<AddMemberPage> {
       daysAttended: 0, // Example: Set days attended
     );
     if(user?.role=="Admin"){
-      _adminSave(newMember);
-    }
-    else{
-      MembershipRequest newMembershipRequest = MembershipRequest.fromGymMember(newMember, user?.id??"");
+      // _adminSave(newMember);
+    // }
+    // else{ todo : Uncomment after testing finished
+      MembershipRequest newMembershipRequest = MembershipRequest.fromGymMember(newMember, user?.id??"",user?.name??"");
       _addMemberRequest(newMembershipRequest);
     }
 
