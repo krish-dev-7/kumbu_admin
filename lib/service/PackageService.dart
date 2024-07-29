@@ -2,10 +2,11 @@
 
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:kumbu_admin/Common/Constants.dart';
 import '../Models/Package.dart';
 
 class PackageService {
-  static const String baseUrl = 'https://kumbubackend.onrender.com'; // Replace with your API base URL
+  static String baseUrl = BASE_URL; // Replace with your API base URL
 
   Future<List<Package>> getPackages() async {
     String apiUrl = '$baseUrl/api/packages'; // Replace with your specific endpoint
@@ -81,6 +82,15 @@ class PackageService {
       }
     } catch (e) {
       throw Exception('Error deleting package: $e');
+    }
+  }
+
+  Future<Package> getPackageById(String id) async {
+    final response = await http.get(Uri.parse('$baseUrl/packages/$id'));
+    if (response.statusCode == 200) {
+      return Package.fromJson(json.decode(response.body));
+    } else {
+      throw Exception('Failed to load package');
     }
   }
 }

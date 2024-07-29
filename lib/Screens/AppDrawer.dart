@@ -48,9 +48,9 @@ class AppDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: Icon(Icons.water_drop_rounded),
-            title: Text('Requests'),
+            title: Text('Subscription Requests'),
             onTap: () {
-              Navigator.pushNamed(context, '/requestPage');
+              Navigator.pushNamed(context, '/SubscriptionRequestPage');
             },
           ),
           ListTile(

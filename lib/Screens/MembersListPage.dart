@@ -104,11 +104,11 @@ class _MembersListPageState extends State<MembersListPage> {
                       "Members: ",
                       style: TextStyle(fontWeight: FontWeight.bold, color: appLightGreen),
                     ),
-                    const SizedBox(width: 10),
+                    const SizedBox(width: 7),
                     _buildRadioButton('All', MemberFilter.all),
-                    const SizedBox(width: 10),
+                    const SizedBox(width: 7),
                     _buildRadioButton('Active', MemberFilter.active),
-                    const SizedBox(width: 10),
+                    const SizedBox(width: 7),
                     _buildRadioButton('Inactive', MemberFilter.inactive),
                   ],
                 ),
@@ -266,13 +266,16 @@ class _MembersListPageState extends State<MembersListPage> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
                   onPressed: _previousPage,
                   child: Text('Previous'),
                 ),
-                Text('Page $currentPage of $totalPages'),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text('Page $currentPage of $totalPages'),
+                ),
                 ElevatedButton(
                   onPressed: _nextPage,
                   child: Text('Next'),

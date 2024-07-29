@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:kumbu_admin/Common/ThemeData.dart';
 import 'package:kumbu_admin/Screens/AttendancePage.dart';
 import 'package:kumbu_admin/Screens/GlobalPaymentHistory.dart';
-import 'package:kumbu_admin/Screens/RequestPage.dart';
+import 'package:kumbu_admin/Screens/PackageRequestPage.dart';
 import 'package:kumbu_admin/Screens/diets/DietsTemplatePage.dart';
+import 'package:kumbu_admin/service/UserService.dart';
 
+import 'Common/config.dart';
 import 'Models/Member.dart';
 import 'Screens/MembersListPage.dart';
 import 'Screens/PackagePage.dart';
@@ -20,7 +22,12 @@ void main()  {
   //   options: DefaultFirebaseOptions.currentPlatform,
   // );
 
+  UserService().getUserByEmail("krish0cyber@gmail.com");
+
+  print("USER : ${user?.name}");
+
   runApp(MaterialApp(
+    title: 'Kumbu Admin App',
     theme: appTheme,
     debugShowCheckedModeBanner: false,
     home: MembersListPage(),
@@ -28,7 +35,7 @@ void main()  {
     routes: {
       '/package': (context) => PackagePage(),
       '/profile': (context) => ProfilePage(),
-      '/requestPage': (context) => QuotationPage(),
+      '/SubscriptionRequestPage': (context) => QuotationPage(),
       '/dietsPage': (context) => DietTemplatesPage(),
       '/workoutPage': (context) => WorkoutTemplateListScreen(),
       '/incomeHistory': (context) => GlobalPaymentHistoryPage(),
