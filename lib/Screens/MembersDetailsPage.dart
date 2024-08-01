@@ -1,6 +1,7 @@
 import 'dart:io';
 
 // import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -36,6 +37,7 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
   List<Package> _packages = [];
   MembershipLevel? _selectedLevel;
   File? _image;
+  String? _imgUrl;
   get data => null;
 
 
@@ -63,6 +65,7 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
     // Initialize controllers with existing member data
     _nameController = TextEditingController(text: widget.member.name);
     _selectedLevel = widget.member.level;
+    _imgUrl = widget.member.imageUrl;
     _ageController = TextEditingController(text: widget.member.age.toString());
     _genderController = TextEditingController(text: widget.member.gender);
     _emailController = TextEditingController(text: widget.member.email);
@@ -142,9 +145,15 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
                     children: [
                       Expanded(
                         child: Center(
-                          child: _image == null
-                              ? Text('No image selected.')
-                              : Image.file(_image!),
+                          child: CachedNetworkImage(
+                            progressIndicatorBuilder: (context, url, progress) => Center(
+                              child: CircularProgressIndicator(
+                                value: progress.progress,
+                              ),
+                            ),
+                            imageUrl:
+                            _imgUrl!,
+                          ),
                         ),
                       ),
                       ElevatedButton(

@@ -1,4 +1,4 @@
-// import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:kumbu_admin/Common/ThemeData.dart';
 import 'package:kumbu_admin/Screens/AttendancePage.dart';
@@ -13,12 +13,12 @@ import 'Screens/ProfilePage.dart';
 import 'Screens/workouts/WokoutTemplateListScreen.dart';
 import 'firebase_options.dart';
 
-void main()  {
-  // WidgetsFlutterBinding.ensureInitialized();
-  // // FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-  // await Firebase.initializeApp(
-  //   options: DefaultFirebaseOptions.currentPlatform,
-  // );
+void main()  async{
+  WidgetsFlutterBinding.ensureInitialized();
+  // FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   runApp(MaterialApp(
     theme: appTheme,

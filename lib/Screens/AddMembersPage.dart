@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../Models/Member.dart'; // Update path as per your project structure
@@ -130,8 +132,8 @@ class _AddMemberPageState extends State<AddMemberPage> {
               _saveMemberDetails();
             },
             style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all<Color>(appDarkGreen),
-              shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+              backgroundColor: WidgetStateProperty.all<Color>(appDarkGreen),
+              shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                 RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20), // Adjust the radius as needed
                 ),
@@ -213,8 +215,8 @@ class _AddMemberPageState extends State<AddMemberPage> {
                 _saveMemberDetails();
               },
               style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all<Color>(appDarkGreen),
-                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                backgroundColor: WidgetStateProperty.all<Color>(appDarkGreen),
+                shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                   RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20), // Adjust the radius as needed
                   ),
@@ -348,44 +350,60 @@ class _AddMemberPageState extends State<AddMemberPage> {
     }
   }
 
-  void _saveMemberDetails() {
+  void _saveMemberDetails() async{
     // Validate inputs and save member details
-    String imageUrl = imageUrlController.text;
-    String name = nameController.text;
-    int age = int.tryParse(ageController.text) ?? 0; // Handle parsing error as needed
-    String gender = genderController.text;
-    String email = emailController.text;
-    String phoneNumber = phoneNumberController.text;
-    String address = addressController.text;
-    String membershipDuration = _selectedPackage!.getReadableDuration();
-    String membershipStartDate = membershipStartDateController.text;
-    String membershipEndDate = membershipEndDateController.text;
-    String selectedPackage = packageController.text; // Get selected package
 
-    // Create a new GymMember object or update existing member
-    GymMember newMember = GymMember(
-      imageUrl: imageUrl,
-      name: name,
-      age: age,
-      gender: gender,
-      email: email,
-      phoneNumber: phoneNumber,
-      address: address,
-      membershipDuration: membershipDuration,
-      membershipStartDate: DateTime.parse(membershipStartDate),
-      membershipEndDate: DateTime.parse(membershipEndDate),
-      id: '', // Assign member ID as needed
-      gymMemberID: 0,
-      currentPackage: _selectedPackage, // Assign selected package
-      level: MembershipLevel.BRONZE, // Example: Set membership level
-      dietTemplateID: "", // Example: Set diet ID
-      daysAttended: 0, // Example: Set days attended
-    );
+    if (_image == null) return;
+
     try {
+      // Upload image to Firebase Storage
+      final Reference storageRef = FirebaseStorage.instance
+          .ref()
+          .child('profilePic')
+          .child('${emailController.text}.jpg');
+
+      final UploadTask uploadTask = storageRef.putFile(_image!);
+      final TaskSnapshot storageSnapshot = await uploadTask;
+
+      // Get the download URL of the uploaded image
+      final String downloadUrl = await storageSnapshot.ref.getDownloadURL();
+
+      String imageUrl = downloadUrl;
+      String name = nameController.text;
+      int age = int.tryParse(ageController.text) ?? 0; // Handle parsing error as needed
+      String gender = genderController.text;
+      String email = emailController.text;
+      String phoneNumber = phoneNumberController.text;
+      String address = addressController.text;
+      String membershipDuration = _selectedPackage!.getReadableDuration();
+      String membershipStartDate = membershipStartDateController.text;
+      String membershipEndDate = membershipEndDateController.text;
+      String selectedPackage = packageController.text; // Get selected package
+      // Create a new GymMember object or update existing member
+      GymMember newMember = GymMember(
+        imageUrl: imageUrl,
+        name: name,
+        age: age,
+        gender: gender,
+        email: email,
+        phoneNumber: phoneNumber,
+        address: address,
+        membershipDuration: membershipDuration,
+        membershipStartDate: DateTime.parse(membershipStartDate),
+        membershipEndDate: DateTime.parse(membershipEndDate),
+        id: '', // Assign member ID as needed
+        gymMemberID: 0,
+        currentPackage: _selectedPackage, // Assign selected package
+        level: MembershipLevel.BRONZE, // Example: Set membership level
+        dietTemplateID: "", // Example: Set diet ID
+        daysAttended: 0, // Example: Set days attended
+      );
+
       _memberService.addMember(newMember); // Await if you need to handle response or errors
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Member added successfully')),
+        const SnackBar(content: Text('Member added successfully')),
       );
+
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to add member: $e')),
