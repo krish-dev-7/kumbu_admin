@@ -1,7 +1,11 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:kumbu_admin/Common/config.dart';
+import 'package:kumbu_admin/Models/MembershipRequest.dart';
+import 'package:kumbu_admin/service/MembershipRequestService.dart';
 import '../Models/Member.dart'; // Update path as per your project structure
 import 'package:kumbu_admin/Common/ThemeData.dart';
 import 'package:image_picker/image_picker.dart';
@@ -28,9 +32,22 @@ class _AddMemberPageState extends State<AddMemberPage> {
   final TextEditingController membershipEndDateController = TextEditingController();
   final TextEditingController packageController = TextEditingController();
 
+  void initializeControllersForTesting(){
+    imageUrlController.text="";
+    nameController.text="name";
+    ageController.text="29";
+    genderController.text="Male";
+    emailController.text="test@test.com";
+    phoneNumberController.text="0398203982";
+    addressController.text="test address";
+    membershipStartDateController.text="2024-07-29";
+    membershipEndDateController.text="2024-08-29";
+  }
+
   File? _image;
   final picker = ImagePicker();
   final MemberService _memberService = MemberService();
+  final MembershipRequestService _membershipRequestService = new MembershipRequestService();
   List<Package> _packages = [];
   Package? _selectedPackage;
 
@@ -49,6 +66,7 @@ class _AddMemberPageState extends State<AddMemberPage> {
   void initState() {
     super.initState();
     _fetchPackages();
+    initializeControllersForTesting();// todo: Remove after testing
   }
 
   Future<void> _fetchPackages() async {
@@ -361,8 +379,6 @@ class _AddMemberPageState extends State<AddMemberPage> {
     String membershipStartDate = membershipStartDateController.text;
     String membershipEndDate = membershipEndDateController.text;
     String selectedPackage = packageController.text; // Get selected package
-
-    // Create a new GymMember object or update existing member
     GymMember newMember = GymMember(
       imageUrl: imageUrl,
       name: name,
@@ -381,6 +397,20 @@ class _AddMemberPageState extends State<AddMemberPage> {
       dietTemplateID: "", // Example: Set diet ID
       daysAttended: 0, // Example: Set days attended
     );
+    if(user?.role=="Admin"){
+      // _adminSave(newMember);
+    // }
+    // else{ todo : Uncomment after testing finished
+      MembershipRequest newMembershipRequest = MembershipRequest.fromGymMember(newMember, user?.id??"",user?.name??"");
+      _addMemberRequest(newMembershipRequest);
+    }
+
+
+    // Navigator.pop(context);
+  }
+
+  void _adminSave(GymMember newMember){
+    // Create a new GymMember object or update existing member
     try {
       _memberService.addMember(newMember); // Await if you need to handle response or errors
       ScaffoldMessenger.of(context).showSnackBar(
@@ -391,6 +421,20 @@ class _AddMemberPageState extends State<AddMemberPage> {
         SnackBar(content: Text('Failed to add member: $e')),
       );
     }
-    // Navigator.pop(context);
+  }
+  void _addMemberRequest(MembershipRequest newMemberRequest){
+    try {
+      _membershipRequestService.createMembershipRequest(newMemberRequest); // Await if you need to handle response or errors
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Requested successfully')),
+      );
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to request')),
+      );
+    }
   }
 }
