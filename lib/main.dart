@@ -16,12 +16,12 @@ import 'Screens/workouts/WokoutTemplateListScreen.dart';
 import 'firebase_options.dart';
 import 'Screens/MembershipRequestPage.dart';
 
-void main() {
-  // WidgetsFlutterBinding.ensureInitialized();
-  // // FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-  // await Firebase.initializeApp(
-  //   options: DefaultFirebaseOptions.currentPlatform,
-  // );
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  // FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   runApp(MaterialApp(
     title: 'Kumbu Admin App',

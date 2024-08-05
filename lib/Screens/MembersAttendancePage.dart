@@ -17,9 +17,9 @@ class _MemberAttendancePageState extends State<MemberAttendancePage> {
   late Future<List<Attendance>> _futureAttendance;
   final AttendanceService _attendanceService = AttendanceService();
   Map<DateTime, List<Attendance>> _groupedAttendance = {};
-  final DateTime _focusedDay = DateTime.now();
+  DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
-  final List<Attendance> _selectedAttendance = [];
+  List<Attendance> _selectedAttendance = [];
   double currentMonthAverage = 0;
   double previousMonthAverage = 0;
   double improvementPercentage = 0;
@@ -237,7 +237,7 @@ class _MemberAttendancePageState extends State<MemberAttendancePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Attendance Records'),
+        title: const Text('Dashboard'),
       ),
       body: FutureBuilder<List<Attendance>>(
         future: _futureAttendance,
@@ -245,32 +245,195 @@ class _MemberAttendancePageState extends State<MemberAttendancePage> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            print(snapshot.error);
-            return const Center(child: Text('No attendance records found :('));
+            return Center(child: Text('Error: ${snapshot.error}'));
           } else if (snapshot.hasData && snapshot.data!.isEmpty) {
             return const Center(child: Text('No attendance records found'));
           } else if (snapshot.hasData) {
-            List<Attendance> attendanceRecords = snapshot.data!;
-            return Center(
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Center(
-                  child: DataTable(
-                    columns: const [
-                      DataColumn(label: Text('Date')),
-                      DataColumn(label: Text('Entry Time')),
-                      DataColumn(label: Text('Exit Time')),
-                    ],
-                    rows: attendanceRecords
-                        .map((attendance) => _createDataRow(attendance))
-                        .toList(),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: appLightGreen),
-                      borderRadius: BorderRadius.circular(16),
+            List<Attendance> attendances = snapshot.data!;
+            _groupedAttendance = _groupAttendanceByDate(attendances);
+
+            return LayoutBuilder(
+              builder: (context, constraints) {
+                if (constraints.maxWidth > 1000) {
+                  return Padding(
+                    padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          flex: 1,
+                          child: TableCalendar(
+                            firstDay: DateTime.utc(2021, 1, 1),
+                            lastDay: DateTime.utc(2030, 12, 31),
+                            focusedDay: _focusedDay,
+                            selectedDayPredicate: (day) {
+                              return isSameDay(_selectedDay, day);
+                            },
+                            onDaySelected: (selectedDay, focusedDay) {
+                              setState(() {
+                                _selectedDay = selectedDay;
+                                _focusedDay = focusedDay;
+                                _selectedAttendance =
+                                    _getAttendancesForDay(selectedDay);
+                              });
+                            },
+                            eventLoader: (day) {
+                              return _groupedAttendance[
+                                      DateTime(day.year, day.month, day.day)] ??
+                                  [];
+                            },
+                            calendarBuilders: CalendarBuilders(
+                              markerBuilder: (context, date, events) {
+                                if (events.isNotEmpty) {
+                                  return Positioned(
+                                    right: 1,
+                                    bottom: 1,
+                                    child: Container(
+                                      width: 16,
+                                      height: 16,
+                                      decoration: BoxDecoration(
+                                        color: appLightGreen,
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
+                                  );
+                                }
+                                return null;
+                              },
+                              todayBuilder: (context, date, _) {
+                                return Container(
+                                  decoration: BoxDecoration(
+                                    color: appDarkGreen,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  margin: const EdgeInsets.all(4.0),
+                                  width: 100,
+                                  height: 100,
+                                  child: Center(
+                                    child: Text(
+                                      '${date.day}',
+                                      style: const TextStyle().copyWith(
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          flex: 2,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              if (_selectedAttendance.isNotEmpty)
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: _buildAttendanceList(
+                                        _selectedAttendance),
+                                  ),
+                                )
+                              else
+                                const Expanded(
+                                  child: Center(
+                                      child: Text(
+                                          'Select a date to view attendance')),
+                                ),
+                              _buildStatistics(),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                ),
-              ),
+                  );
+                } else {
+                  return SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: SizedBox(
+                      height: MediaQuery.of(context).size.height,
+                      child: Column(
+                        children: [
+                          TableCalendar(
+                            firstDay: DateTime.utc(2021, 1, 1),
+                            lastDay: DateTime.utc(2030, 12, 31),
+                            focusedDay: _focusedDay,
+                            selectedDayPredicate: (day) {
+                              return isSameDay(_selectedDay, day);
+                            },
+                            onDaySelected: (selectedDay, focusedDay) {
+                              setState(() {
+                                _selectedDay = selectedDay;
+                                _focusedDay = focusedDay;
+                                _selectedAttendance =
+                                    _getAttendancesForDay(selectedDay);
+                              });
+                            },
+                            eventLoader: (day) {
+                              return _groupedAttendance[
+                                      DateTime(day.year, day.month, day.day)] ??
+                                  [];
+                            },
+                            calendarBuilders: CalendarBuilders(
+                              markerBuilder: (context, date, events) {
+                                if (events.isNotEmpty) {
+                                  return Positioned(
+                                    right: 1,
+                                    bottom: 1,
+                                    child: Container(
+                                      width: 16,
+                                      height: 16,
+                                      decoration: BoxDecoration(
+                                        color: appLightGreen,
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
+                                  );
+                                }
+                                return null;
+                              },
+                              todayBuilder: (context, date, _) {
+                                return Container(
+                                  decoration: BoxDecoration(
+                                    color: appDarkGreen,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  margin: const EdgeInsets.all(4.0),
+                                  width: 100,
+                                  height: 100,
+                                  child: Center(
+                                    child: Text(
+                                      '${date.day}',
+                                      style: const TextStyle().copyWith(
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                          if (_selectedAttendance.isNotEmpty) ...[
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child:
+                                    _buildAttendanceList(_selectedAttendance),
+                              ),
+                            ),
+                            _buildStatistics(),
+                          ] else
+                            const Expanded(
+                              child: Center(
+                                  child:
+                                      Text('Select a date to view attendance')),
+                            ),
+                        ],
+                      ),
+                    ),
+                  );
+                }
+              },
             );
           } else {
             return const Center(child: Text('No data available'));
