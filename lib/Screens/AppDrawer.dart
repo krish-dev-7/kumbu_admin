@@ -48,9 +48,9 @@ class AppDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: Icon(Icons.water_drop_rounded),
-            title: Text('Requests'),
+            title: Text('Subscription Requests'),
             onTap: () {
-              Navigator.pushNamed(context, '/requestPage');
+              Navigator.pushNamed(context, '/SubscriptionRequestPage');
             },
           ),
           ListTile(
@@ -79,6 +79,13 @@ class AppDrawer extends StatelessWidget {
             title: Text('Entries'),
             onTap: () {
               Navigator.pushNamed(context, '/AttendancePage');
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.list_alt),
+            title: Text('Membership requests'),
+            onTap: () {
+              Navigator.pushNamed(context, '/MembershipRequestPage');
             },
           ),
 

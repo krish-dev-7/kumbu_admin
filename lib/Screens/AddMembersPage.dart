@@ -2,8 +2,12 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:kumbu_admin/Common/config.dart';
+import 'package:kumbu_admin/Models/MembershipRequest.dart';
+import 'package:kumbu_admin/service/MembershipRequestService.dart';
 import '../Models/Member.dart'; // Update path as per your project structure
 import 'package:kumbu_admin/Common/ThemeData.dart';
 import 'package:image_picker/image_picker.dart';
@@ -13,6 +17,8 @@ import '../service/MemberService.dart';
 import '../service/PackageService.dart';
 
 class AddMemberPage extends StatefulWidget {
+  const AddMemberPage({super.key});
+
   @override
   State<AddMemberPage> createState() => _AddMemberPageState();
 }
@@ -26,23 +32,40 @@ class _AddMemberPageState extends State<AddMemberPage> {
   final TextEditingController phoneNumberController = TextEditingController();
   final TextEditingController addressController = TextEditingController();
   // final TextEditingController membershipDurationController = TextEditingController();
-  final TextEditingController membershipStartDateController = TextEditingController();
-  final TextEditingController membershipEndDateController = TextEditingController();
+  final TextEditingController membershipStartDateController =
+      TextEditingController();
+  final TextEditingController membershipEndDateController =
+      TextEditingController();
   final TextEditingController packageController = TextEditingController();
+
+  void initializeControllersForTesting() {
+    imageUrlController.text = "";
+    nameController.text = "name";
+    ageController.text = "29";
+    genderController.text = "Male";
+    emailController.text = "test@test.com";
+    phoneNumberController.text = "0398203982";
+    addressController.text = "test address";
+    membershipStartDateController.text = "2024-07-29";
+    membershipEndDateController.text = "2024-08-29";
+  }
 
   File? _image;
   final picker = ImagePicker();
   final MemberService _memberService = MemberService();
+  final MembershipRequestService _membershipRequestService =
+      MembershipRequestService();
   List<Package> _packages = [];
   Package? _selectedPackage;
 
-
   Future getImage() async {
-    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
         _image = File(pickedFile.path);
-        imageUrlController.text = pickedFile.path; // Update controller with image path
+        imageUrlController.text =
+            pickedFile.path; // Update controller with image path
       });
     }
   }
@@ -51,6 +74,7 @@ class _AddMemberPageState extends State<AddMemberPage> {
   void initState() {
     super.initState();
     _fetchPackages();
+    initializeControllersForTesting(); // todo: Remove after testing
   }
 
   Future<void> _fetchPackages() async {
@@ -70,7 +94,8 @@ class _AddMemberPageState extends State<AddMemberPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add Member', style: Theme.of(context).appBarTheme.titleTextStyle),
+        title: Text('Add Member',
+            style: Theme.of(context).appBarTheme.titleTextStyle),
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {
@@ -88,7 +113,7 @@ class _AddMemberPageState extends State<AddMemberPage> {
 
   Widget _buildSingleColumnLayout(BuildContext context) {
     return SingleChildScrollView(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -101,7 +126,7 @@ class _AddMemberPageState extends State<AddMemberPage> {
                     radius: 60,
                     backgroundImage: _image != null ? FileImage(_image!) : null,
                     child: _image == null
-                        ? Icon(Icons.account_circle, size: 60)
+                        ? const Icon(Icons.account_circle, size: 60)
                         : null,
                   ),
                   Positioned(
@@ -109,14 +134,14 @@ class _AddMemberPageState extends State<AddMemberPage> {
                     right: 0,
                     child: CircleAvatar(
                       backgroundColor: Colors.grey[200],
-                      child: Icon(Icons.edit, color: Colors.black),
+                      child: const Icon(Icons.edit, color: Colors.black),
                     ),
                   ),
                 ],
               ),
             ),
           ), // Member Image
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           _buildTextField(context, 'Name', nameController),
           _buildTextField(context, 'Age', ageController),
           _buildTextField(context, 'Gender', genderController),
@@ -124,9 +149,11 @@ class _AddMemberPageState extends State<AddMemberPage> {
           _buildTextField(context, 'Phone Number', phoneNumberController),
           _buildTextField(context, 'Address', addressController),
           _buildPackageDropdown(context), // Package selection dropdown
-          _buildDateField(context, 'Membership Start Date', membershipStartDateController),
-          _buildDateField(context, 'Membership End Date', membershipEndDateController),
-          SizedBox(height: 20),
+          _buildDateField(
+              context, 'Membership Start Date', membershipStartDateController),
+          _buildDateField(
+              context, 'Membership End Date', membershipEndDateController),
+          const SizedBox(height: 20),
           ElevatedButton(
             onPressed: () {
               _saveMemberDetails();
@@ -135,11 +162,12 @@ class _AddMemberPageState extends State<AddMemberPage> {
               backgroundColor: WidgetStateProperty.all<Color>(appDarkGreen),
               shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                 RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20), // Adjust the radius as needed
+                  borderRadius:
+                      BorderRadius.circular(20), // Adjust the radius as needed
                 ),
               ),
             ),
-            child: Text(
+            child: const Text(
               'Save Member',
               style: TextStyle(
                 color: Colors.white,
@@ -167,7 +195,7 @@ class _AddMemberPageState extends State<AddMemberPage> {
                   ),
                 ),
               ),
-              SizedBox(width: 16),
+              const SizedBox(width: 16),
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
@@ -180,9 +208,10 @@ class _AddMemberPageState extends State<AddMemberPage> {
                             children: [
                               CircleAvatar(
                                 radius: 50,
-                                backgroundImage: _image != null ? FileImage(_image!) : null,
+                                backgroundImage:
+                                    _image != null ? FileImage(_image!) : null,
                                 child: _image == null
-                                    ? Icon(Icons.account_circle, size: 50)
+                                    ? const Icon(Icons.account_circle, size: 50)
                                     : null,
                               ),
                               Positioned(
@@ -190,18 +219,22 @@ class _AddMemberPageState extends State<AddMemberPage> {
                                 right: 0,
                                 child: CircleAvatar(
                                   backgroundColor: Colors.grey[200],
-                                  child: Icon(Icons.edit, color: Colors.black),
+                                  child: const Icon(Icons.edit,
+                                      color: Colors.black),
                                 ),
                               ),
                             ],
                           ),
                         ),
                       ),
-                      SizedBox(height: 20),
-                      _buildPackageDropdown(context), // Package selection dropdown
-                      _buildDateField(context, 'Membership Start Date', membershipStartDateController),
-                      _buildDateField(context, 'Membership End Date', membershipEndDateController),
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
+                      _buildPackageDropdown(
+                          context), // Package selection dropdown
+                      _buildDateField(context, 'Membership Start Date',
+                          membershipStartDateController),
+                      _buildDateField(context, 'Membership End Date',
+                          membershipEndDateController),
+                      const SizedBox(height: 20),
                     ],
                   ),
                 ),
@@ -218,11 +251,12 @@ class _AddMemberPageState extends State<AddMemberPage> {
                 backgroundColor: WidgetStateProperty.all<Color>(appDarkGreen),
                 shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                   RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20), // Adjust the radius as needed
+                    borderRadius: BorderRadius.circular(
+                        20), // Adjust the radius as needed
                   ),
                 ),
               ),
-              child: Text(
+              child: const Text(
                 'Save Member',
                 style: TextStyle(
                   color: Colors.white,
@@ -246,7 +280,8 @@ class _AddMemberPageState extends State<AddMemberPage> {
     ];
   }
 
-  Widget _buildTextField(BuildContext context, String label, TextEditingController controller) {
+  Widget _buildTextField(
+      BuildContext context, String label, TextEditingController controller) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -254,7 +289,7 @@ class _AddMemberPageState extends State<AddMemberPage> {
           controller: controller,
           decoration: InputDecoration(
             labelText: label,
-            labelStyle: TextStyle(color: Colors.white70),
+            labelStyle: const TextStyle(color: Colors.white70),
             enabledBorder: OutlineInputBorder(
               borderSide: BorderSide(color: appLightGreen),
             ),
@@ -264,18 +299,17 @@ class _AddMemberPageState extends State<AddMemberPage> {
             fillColor: Colors.white10,
           ),
         ),
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
       ],
     );
   }
-
 
   Widget _buildPackageDropdown(BuildContext context) {
     return Column(
       children: [
         DropdownButtonFormField<Package>(
           value: _selectedPackage,
-          hint: Text('Select Package'),
+          hint: const Text('Select Package'),
           onChanged: (Package? newValue) {
             setState(() {
               _selectedPackage = newValue;
@@ -285,7 +319,8 @@ class _AddMemberPageState extends State<AddMemberPage> {
           items: _packages.map((Package package) {
             return DropdownMenuItem<Package>(
               value: package,
-              child: Text('${package.level} - ${package.getReadableDuration()} - \₹${package.amount}'),
+              child: Text(
+                  '${package.level} - ${package.getReadableDuration()} - ₹${package.amount}'),
             );
           }).toList(),
           decoration: InputDecoration(
@@ -301,13 +336,15 @@ class _AddMemberPageState extends State<AddMemberPage> {
             fillColor: Colors.white10,
           ),
         ),
-        SizedBox(height: 16,)
+        const SizedBox(
+          height: 16,
+        )
       ],
     );
   }
 
-
-  Widget _buildDateField(BuildContext context, String label, TextEditingController controller) {
+  Widget _buildDateField(
+      BuildContext context, String label, TextEditingController controller) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -319,7 +356,7 @@ class _AddMemberPageState extends State<AddMemberPage> {
               decoration: InputDecoration(
                 labelText: label,
                 suffixIcon: Icon(Icons.calendar_today, color: appLightGreen),
-                labelStyle: TextStyle(color: Colors.white70),
+                labelStyle: const TextStyle(color: Colors.white70),
                 enabledBorder: OutlineInputBorder(
                   borderSide: BorderSide(color: appLightGreen),
                 ),
@@ -331,12 +368,13 @@ class _AddMemberPageState extends State<AddMemberPage> {
             ),
           ),
         ),
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
       ],
     );
   }
 
-  Future<void> _selectDate(BuildContext context, TextEditingController controller) async {
+  Future<void> _selectDate(
+      BuildContext context, TextEditingController controller) async {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
@@ -350,7 +388,7 @@ class _AddMemberPageState extends State<AddMemberPage> {
     }
   }
 
-  void _saveMemberDetails() async{
+  void _saveMemberDetails() async {
     // Validate inputs and save member details
 
     if (_image == null) return;
@@ -370,7 +408,8 @@ class _AddMemberPageState extends State<AddMemberPage> {
 
       String imageUrl = downloadUrl;
       String name = nameController.text;
-      int age = int.tryParse(ageController.text) ?? 0; // Handle parsing error as needed
+      int age = int.tryParse(ageController.text) ??
+          0; // Handle parsing error as needed
       String gender = genderController.text;
       String email = emailController.text;
       String phoneNumber = phoneNumberController.text;
@@ -399,16 +438,32 @@ class _AddMemberPageState extends State<AddMemberPage> {
         daysAttended: 0, // Example: Set days attended
       );
 
-      _memberService.addMember(newMember); // Await if you need to handle response or errors
+      _memberService.addMember(
+          newMember); // Await if you need to handle response or errors
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Member added successfully')),
       );
-
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to add member: $e')),
       );
     }
-    // Navigator.pop(context);
+  }
+
+  void _addMemberRequest(MembershipRequest newMemberRequest) {
+    try {
+      _membershipRequestService.createMembershipRequest(
+          newMemberRequest); // Await if you need to handle response or errors
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Requested successfully')),
+      );
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to request')),
+      );
+    }
   }
 }
