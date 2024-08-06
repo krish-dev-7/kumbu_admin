@@ -78,213 +78,282 @@ class _MembersListPageState extends State<MembersListPage> {
     }
   }
 
+  Future<void> _refresh() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      setState(() {
+        build(context);
+        _fetchMembers();
+        _isLoading = false;
+        debugPrint("Refreshed");
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        debugPrint("Error");
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Members List'),
+        actions: [
+          IconButton(onPressed: _refresh, icon: const Icon(Icons.refresh))
+        ],
       ),
       drawer: AppDrawer(),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
           : Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Container(
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.white, width: 1),
-              ),
-              child: Padding(
+            children: [
+              Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Members: ",
-                      style: TextStyle(fontWeight: FontWeight.bold, color: appLightGreen),
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.white, width: 1),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Members: ",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: appLightGreen),
+                        ),
+                        const SizedBox(width: 10),
+                        _buildRadioButton('All', MemberFilter.all),
+                        const SizedBox(width: 10),
+                        _buildRadioButton('Active', MemberFilter.active),
+                        const SizedBox(width: 10),
+                        _buildRadioButton(
+                            'Inactive', MemberFilter.inactive),
+                      ],
                     ),
-                    const SizedBox(width: 7),
-                    _buildRadioButton('All', MemberFilter.all),
-                    const SizedBox(width: 7),
-                    _buildRadioButton('Active', MemberFilter.active),
-                    const SizedBox(width: 7),
-                    _buildRadioButton('Inactive', MemberFilter.inactive),
-                  ],
+                  ),
                 ),
               ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              decoration: InputDecoration(
-                labelText: 'Search by name or ID',
-                labelStyle: TextStyle(color: Colors.white70),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: appLightGreen),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: appLightGreen),
-                ),
-                prefixIcon: Icon(Icons.search),
-              ),
-              onSubmitted: (value) {
-                setState(() {
-                  searchQuery = value;
-                  _fetchMembers(search: searchQuery);
-                });
-              },
-            ),
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    int crossAxisCount = constraints.maxWidth > 600 ? 3 : 1;
-                    return GridView.builder(
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: crossAxisCount,
-                        crossAxisSpacing: 1.0,
-                        mainAxisSpacing: 1.0,
-                        childAspectRatio: 3,
-                      ),
-                      itemCount: filteredMembers.length,
-                      itemBuilder: (context, index) {
-                        GymMember member = filteredMembers[index];
-                        return InkWell(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => MemberDetailsPage(member: member),
-                              ),
-                            );
-                          },
-                          child: Stack(
-                            children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(color: appLightGreen, width: 1),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Center(
-                                    child: Row(
-                                      children: [
-                                        member.imageUrl == null
-                                            ? Icon(Icons.account_circle_sharp, size: 60, color: appLightGreen)
-                                            : CircleAvatar(
-                                          backgroundImage: NetworkImage(member.imageUrl!),
-                                          radius: 30,
-                                        ),
-                                        const SizedBox(width: 16),
-                                        Expanded(
-                                          child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  Icon(Icons.person, color: appLightGreen, size: 16),
-                                                  const SizedBox(width: 8),
-                                                  Text(
-                                                    member.name,
-                                                    style: TextStyle(
-                                                      color: Colors.white,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              const SizedBox(height: 4),
-                                              Row(
-                                                children: [
-                                                  Icon(Icons.card_membership, color: appLightGreen, size: 14),
-                                                  const SizedBox(width: 8),
-                                                  Text(
-                                                    'ID: ${member.gymMemberID}',
-                                                    style: TextStyle(
-                                                      color: Colors.white70,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              const SizedBox(height: 4),
-                                              Row(
-                                                children: [
-                                                  Icon(Icons.calendar_today, color: appLightGreen, size: 14),
-                                                  const SizedBox(width: 8),
-                                                  Text(
-                                                    'Due: ${member.subscriptionDue}',
-                                                    style: TextStyle(
-                                                      color: Colors.white70,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              const SizedBox(height: 4),
-                                              Row(
-                                                children: [
-                                                  Icon(Icons.fitness_center, color: appLightGreen, size: 14),
-                                                  const SizedBox(width: 8),
-                                                  Text(
-                                                    member.level.toString().split('.').last,
-                                                    style: TextStyle(
-                                                      color: Colors.white70,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                top: 4,
-                                right: 4,
-                                child: member.isActive
-                                    ? Icon(Icons.check_circle, color: appLightGreen)
-                                    : Icon(Icons.cancel, color: Colors.red),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    );
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  decoration: InputDecoration(
+                    labelText: 'Search by name or ID',
+                    labelStyle: TextStyle(color: Colors.white70),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: appLightGreen),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: appLightGreen),
+                    ),
+                    prefixIcon: Icon(Icons.search),
+                  ),
+                  onSubmitted: (value) {
+                    setState(() {
+                      searchQuery = value;
+                      _fetchMembers(search: searchQuery);
+                    });
                   },
                 ),
               ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  onPressed: _previousPage,
-                  child: Text('Previous'),
-                ),
-                Padding(
+              Expanded(
+                child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Text('Page $currentPage of $totalPages'),
+                  child: Container(
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        int crossAxisCount =
+                            constraints.maxWidth > 600 ? 3 : 1;
+                        return GridView.builder(
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: crossAxisCount,
+                            crossAxisSpacing: 1.0,
+                            mainAxisSpacing: 1.0,
+                            childAspectRatio: 3,
+                          ),
+                          itemCount: filteredMembers.length,
+                          itemBuilder: (context, index) {
+                            GymMember member = filteredMembers[index];
+                            return InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        MemberDetailsPage(member: member),
+                                  ),
+                                );
+                              },
+                              child: Stack(
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius:
+                                          BorderRadius.circular(12),
+                                      border: Border.all(
+                                          color: appLightGreen, width: 1),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Center(
+                                        child: Row(
+                                          children: [
+                                            member.imageUrl == null
+                                                ? Icon(
+                                                    Icons
+                                                        .account_circle_sharp,
+                                                    size: 60,
+                                                    color: appLightGreen)
+                                                : CircleAvatar(
+                                                    backgroundImage:
+                                                        NetworkImage(member
+                                                            .imageUrl!),
+                                                    radius: 30,
+                                                  ),
+                                            const SizedBox(width: 16),
+                                            Expanded(
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .center,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment
+                                                        .start,
+                                                children: [
+                                                  Row(
+                                                    children: [
+                                                      Icon(Icons.person,
+                                                          color:
+                                                              appLightGreen,
+                                                          size: 16),
+                                                      const SizedBox(
+                                                          width: 8),
+                                                      Text(
+                                                        member.name,
+                                                        style: TextStyle(
+                                                          color:
+                                                              Colors.white,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  const SizedBox(height: 4),
+                                                  Row(
+                                                    children: [
+                                                      Icon(
+                                                          Icons
+                                                              .card_membership,
+                                                          color:
+                                                              appLightGreen,
+                                                          size: 14),
+                                                      const SizedBox(
+                                                          width: 8),
+                                                      Text(
+                                                        'ID: ${member.gymMemberID}',
+                                                        style: TextStyle(
+                                                          color: Colors
+                                                              .white70,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  const SizedBox(height: 4),
+                                                  Row(
+                                                    children: [
+                                                      Icon(
+                                                          Icons
+                                                              .calendar_today,
+                                                          color:
+                                                              appLightGreen,
+                                                          size: 14),
+                                                      const SizedBox(
+                                                          width: 8),
+                                                      Text(
+                                                        'Due: ${member.subscriptionDue}',
+                                                        style: TextStyle(
+                                                          color: Colors
+                                                              .white70,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  const SizedBox(height: 4),
+                                                  Row(
+                                                    children: [
+                                                      Icon(
+                                                          Icons
+                                                              .fitness_center,
+                                                          color:
+                                                              appLightGreen,
+                                                          size: 14),
+                                                      const SizedBox(
+                                                          width: 8),
+                                                      Text(
+                                                        member.level
+                                                            .toString()
+                                                            .split('.')
+                                                            .last,
+                                                        style: TextStyle(
+                                                          color: Colors
+                                                              .white70,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Positioned(
+                                    top: 4,
+                                    right: 4,
+                                    child: member.isActive
+                                        ? Icon(Icons.check_circle,
+                                            color: appLightGreen)
+                                        : Icon(Icons.cancel,
+                                            color: Colors.red),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ),
                 ),
-                ElevatedButton(
-                  onPressed: _nextPage,
-                  child: Text('Next'),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    ElevatedButton(
+                      onPressed: _previousPage,
+                      child: Text('Previous'),
+                    ),
+                    Text('Page $currentPage of $totalPages'),
+                    ElevatedButton(
+                      onPressed: _nextPage,
+                      child: Text('Next'),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(

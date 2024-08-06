@@ -53,11 +53,34 @@ class _PackageListPageState extends State<PackageListPage> {
     }
   }
 
+  Future<void> _refresh() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      setState(() {
+        build(context);
+        _fetchPackages();
+        _isLoading = false;
+        debugPrint("Refreshed");
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        debugPrint("Error");
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Packages'),
+        title:  Text('Packages'),
+        actions: [
+          IconButton(onPressed: _refresh, icon: const Icon(Icons.refresh)),
+        ],
       ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
