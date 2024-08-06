@@ -7,7 +7,7 @@ import '../service/AttendanceService.dart';
 class MemberAttendancePage extends StatefulWidget {
   final String memberId;
 
-  MemberAttendancePage({required this.memberId});
+  const MemberAttendancePage({super.key, required this.memberId});
 
   @override
   _MemberAttendancePageState createState() => _MemberAttendancePageState();
@@ -27,7 +27,8 @@ class _MemberAttendancePageState extends State<MemberAttendancePage> {
   @override
   void initState() {
     super.initState();
-    _futureAttendance = _attendanceService.getAttendanceByMember(widget.memberId);
+    _futureAttendance =
+        _attendanceService.getAttendanceByMember(widget.memberId);
     _futureAttendance.then((attendances) {
       setState(() {
         _groupedAttendance = _groupAttendanceByDate(attendances);
@@ -57,14 +58,18 @@ class _MemberAttendancePageState extends State<MemberAttendancePage> {
 
     previousMonthAverage = 5;
     improvementPercentage = previousMonthAverage != 0
-        ? ((currentMonthAverage - previousMonthAverage) / previousMonthAverage) * 100
+        ? ((currentMonthAverage - previousMonthAverage) /
+                previousMonthAverage) *
+            100
         : 0;
   }
 
-  Map<DateTime, List<Attendance>> _groupAttendanceByDate(List<Attendance> attendances) {
+  Map<DateTime, List<Attendance>> _groupAttendanceByDate(
+      List<Attendance> attendances) {
     Map<DateTime, List<Attendance>> data = {};
     for (var attendance in attendances) {
-      DateTime date = DateTime(attendance.entry.year, attendance.entry.month, attendance.entry.day);
+      DateTime date = DateTime(
+          attendance.entry.year, attendance.entry.month, attendance.entry.day);
       if (data[date] == null) data[date] = [];
       data[date]!.add(attendance);
     }
@@ -82,7 +87,9 @@ class _MemberAttendancePageState extends State<MemberAttendancePage> {
       itemBuilder: (context, index) {
         Attendance attendance = attendances[index];
         return Container(
-          decoration: BoxDecoration(border: Border.all(color: appLightGreen),borderRadius: BorderRadius.circular(14)),
+          decoration: BoxDecoration(
+              border: Border.all(color: appLightGreen),
+              borderRadius: BorderRadius.circular(14)),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
@@ -92,20 +99,31 @@ class _MemberAttendancePageState extends State<MemberAttendancePage> {
                     children: [
                       const Text("Entry: "),
                       const Icon(Icons.arrow_right_alt),
-                      Text("${attendances[index].entry.toString().split(" ")[1].substring(0, 5)}"),
+                      Text(attendances[index]
+                          .entry
+                          .toString()
+                          .split(" ")[1]
+                          .substring(0, 5)),
                     ],
                   ),
                   subtitle: Row(
                     children: [
                       const Text("Exit: "),
                       const Icon(Icons.arrow_right_alt),
-                      Text("${attendances[index].exit?.toString().split(" ")[1].substring(0, 5) ?? 'N/A'}"),
+                      Text(attendances[index]
+                              .exit
+                              ?.toString()
+                              .split(" ")[1]
+                              .substring(0, 5) ??
+                          'N/A'),
                     ],
                   ),
                 ),
               ),
-              Text("${(attendance.exit != null)? attendance.exit!.difference(attendance.entry).inMinutes : 0} Mins ", style: TextStyle(fontSize: 25, color: Colors.white70),)
-
+              Text(
+                "${(attendance.exit != null) ? attendance.exit!.difference(attendance.entry).inMinutes : 0} Mins ",
+                style: const TextStyle(fontSize: 25, color: Colors.white70),
+              )
             ],
           ),
         );
@@ -124,7 +142,9 @@ class _MemberAttendancePageState extends State<MemberAttendancePage> {
             fit: StackFit.expand,
             children: [
               CircularProgressIndicator(
-                value: improvementPercentage.isFinite ? improvementPercentage / 100 : 0,
+                value: improvementPercentage.isFinite
+                    ? improvementPercentage / 100
+                    : 0,
                 backgroundColor: Colors.grey,
                 valueColor: AlwaysStoppedAnimation<Color>(appLightGreen),
                 strokeWidth: 8.0,
@@ -134,12 +154,13 @@ class _MemberAttendancePageState extends State<MemberAttendancePage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      "${improvementPercentage.isFinite ? improvementPercentage >  300? '>300': improvementPercentage.toStringAsFixed(2): 'N/A'}%",
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      "${improvementPercentage.isFinite ? improvementPercentage > 300 ? '>300' : improvementPercentage.toStringAsFixed(2) : 'N/A'}%",
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold),
                     ),
-                    SizedBox(height: 5),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
+                    const SizedBox(height: 5),
+                    const Padding(
+                      padding: EdgeInsets.all(8.0),
                       child: Text(
                         "improved from prev. month",
                         style: TextStyle(fontSize: 10),
@@ -152,17 +173,22 @@ class _MemberAttendancePageState extends State<MemberAttendancePage> {
             ],
           ),
         ),
-        SizedBox(height: 30,),
+        const SizedBox(
+          height: 30,
+        ),
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Container(
-            decoration: BoxDecoration(border: Border.all(color: appLightGreen),borderRadius: BorderRadius.circular(14)),
+            decoration: BoxDecoration(
+                border: Border.all(color: appLightGreen),
+                borderRadius: BorderRadius.circular(14)),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Column(
                 children: [
                   Text(
-                    "Average Gym Time", style: TextStyle(color: appLightGreen),
+                    "Average Gym Time",
+                    style: TextStyle(color: appLightGreen),
                   ),
                   Text(
                     "Current month: ${currentMonthAverage.toStringAsFixed(2)} minutes",
@@ -190,19 +216,19 @@ class _MemberAttendancePageState extends State<MemberAttendancePage> {
 
     List<Attendance> previousMonthAttendances = _groupedAttendance.entries
         .where((entry) =>
-    entry.key.isAfter(firstDayOfPreviousMonth) &&
-        entry.key.isBefore(firstDayOfCurrentMonth))
+            entry.key.isAfter(firstDayOfPreviousMonth) &&
+            entry.key.isBefore(firstDayOfCurrentMonth))
         .expand((entry) => entry.value)
         .toList();
 
     if (previousMonthAttendances.isEmpty) return 0;
 
     Duration totalDuration = const Duration();
-    previousMonthAttendances.forEach((attendance) {
+    for (var attendance in previousMonthAttendances) {
       if (attendance.exit != null) {
         totalDuration += attendance.exit!.difference(attendance.entry);
       }
-    });
+    }
 
     return totalDuration.inMinutes / previousMonthAttendances.length;
   }
@@ -230,7 +256,7 @@ class _MemberAttendancePageState extends State<MemberAttendancePage> {
               builder: (context, constraints) {
                 if (constraints.maxWidth > 1000) {
                   return Padding(
-                    padding: const EdgeInsets.fromLTRB(8,8,8,8),
+                    padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
                     child: Row(
                       children: [
                         Expanded(
@@ -246,11 +272,14 @@ class _MemberAttendancePageState extends State<MemberAttendancePage> {
                               setState(() {
                                 _selectedDay = selectedDay;
                                 _focusedDay = focusedDay;
-                                _selectedAttendance = _getAttendancesForDay(selectedDay);
+                                _selectedAttendance =
+                                    _getAttendancesForDay(selectedDay);
                               });
                             },
                             eventLoader: (day) {
-                              return _groupedAttendance[DateTime(day.year, day.month, day.day)] ?? [];
+                              return _groupedAttendance[
+                                      DateTime(day.year, day.month, day.day)] ??
+                                  [];
                             },
                             calendarBuilders: CalendarBuilders(
                               markerBuilder: (context, date, events) {
@@ -301,12 +330,15 @@ class _MemberAttendancePageState extends State<MemberAttendancePage> {
                                 Expanded(
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
-                                    child: _buildAttendanceList(_selectedAttendance),
+                                    child: _buildAttendanceList(
+                                        _selectedAttendance),
                                   ),
                                 )
                               else
                                 const Expanded(
-                                  child: Center(child: Text('Select a date to view attendance')),
+                                  child: Center(
+                                      child: Text(
+                                          'Select a date to view attendance')),
                                 ),
                               _buildStatistics(),
                             ],
@@ -318,7 +350,7 @@ class _MemberAttendancePageState extends State<MemberAttendancePage> {
                 } else {
                   return SingleChildScrollView(
                     scrollDirection: Axis.vertical,
-                    child: Container(
+                    child: SizedBox(
                       height: MediaQuery.of(context).size.height,
                       child: Column(
                         children: [
@@ -333,11 +365,14 @@ class _MemberAttendancePageState extends State<MemberAttendancePage> {
                               setState(() {
                                 _selectedDay = selectedDay;
                                 _focusedDay = focusedDay;
-                                _selectedAttendance = _getAttendancesForDay(selectedDay);
+                                _selectedAttendance =
+                                    _getAttendancesForDay(selectedDay);
                               });
                             },
                             eventLoader: (day) {
-                              return _groupedAttendance[DateTime(day.year, day.month, day.day)] ?? [];
+                              return _groupedAttendance[
+                                      DateTime(day.year, day.month, day.day)] ??
+                                  [];
                             },
                             calendarBuilders: CalendarBuilders(
                               markerBuilder: (context, date, events) {
@@ -382,13 +417,16 @@ class _MemberAttendancePageState extends State<MemberAttendancePage> {
                             Expanded(
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
-                                child: _buildAttendanceList(_selectedAttendance),
+                                child:
+                                    _buildAttendanceList(_selectedAttendance),
                               ),
                             ),
                             _buildStatistics(),
                           ] else
                             const Expanded(
-                              child: Center(child: Text('Select a date to view attendance')),
+                              child: Center(
+                                  child:
+                                      Text('Select a date to view attendance')),
                             ),
                         ],
                       ),

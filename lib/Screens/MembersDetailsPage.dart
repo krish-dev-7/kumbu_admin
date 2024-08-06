@@ -1,6 +1,7 @@
 import 'dart:io';
 
 // import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -22,14 +23,14 @@ import '../service/MemberService.dart'; // Import MemberService
 class MemberDetailsPage extends StatefulWidget {
   final GymMember member;
 
-  MemberDetailsPage({required this.member});
+  const MemberDetailsPage({super.key, required this.member});
 
   @override
   _MemberDetailsPageState createState() => _MemberDetailsPageState();
 }
 
 class _MemberDetailsPageState extends State<MemberDetailsPage> {
-  MemberService _memberService = MemberService();
+  final MemberService _memberService = MemberService();
   final WorkoutTemplateService _workoutService = WorkoutTemplateService();
   late List<DietTemplate> _dietTemplates = [];
   String? _selectedDietTemplateId;
@@ -37,8 +38,8 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
   List<Package> _packages = [];
   MembershipLevel? _selectedLevel;
   File? _image;
+  String? _imgUrl;
   get data => null;
-
 
   // Controllers for editable fields
   late TextEditingController _nameController;
@@ -50,7 +51,7 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
   late TextEditingController _membershipStartDateController;
   late TextEditingController _membershipEndDateController;
 
-  Package? _selectedPackage ;
+  Package? _selectedPackage;
 
   @override
   void initState() {
@@ -59,24 +60,27 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
     _fetchPackages();
     _fetchWorkoutTemplates();
 
-
-
     // Initialize controllers with existing member data
     _nameController = TextEditingController(text: widget.member.name);
     _selectedLevel = widget.member.level;
+    _imgUrl = widget.member.imageUrl;
     _ageController = TextEditingController(text: widget.member.age.toString());
     _genderController = TextEditingController(text: widget.member.gender);
     _emailController = TextEditingController(text: widget.member.email);
-    _phoneNumberController = TextEditingController(text: widget.member.phoneNumber);
+    _phoneNumberController =
+        TextEditingController(text: widget.member.phoneNumber);
     _addressController = TextEditingController(text: widget.member.address);
-    _membershipStartDateController = TextEditingController(text: _formatDate(widget.member.membershipStartDate));
-    _membershipEndDateController = TextEditingController(text: _formatDate(widget.member.membershipEndDate));
+    _membershipStartDateController = TextEditingController(
+        text: _formatDate(widget.member.membershipStartDate));
+    _membershipEndDateController = TextEditingController(
+        text: _formatDate(widget.member.membershipEndDate));
     // _selectedPackage = widget.member.currentPackage!;
   }
 
   Future<void> _fetchDietTemplates() async {
     try {
-      List<DietTemplate> dietTemplates = await DietTemplateService().fetchDietTemplates();
+      List<DietTemplate> dietTemplates =
+          await DietTemplateService().fetchDietTemplates();
       setState(() {
         _dietTemplates = dietTemplates;
       });
@@ -87,7 +91,8 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
 
   Future<void> _fetchWorkoutTemplates() async {
     try {
-      List<WorkoutTemplate> workoutTemplates = await _workoutService.fetchWorkoutTemplates();
+      List<WorkoutTemplate> workoutTemplates =
+          await _workoutService.fetchWorkoutTemplates();
       setState(() {
         _workoutTemplates = workoutTemplates;
       });
@@ -99,15 +104,16 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
   String? _selectedWorkoutTemplateId;
   List<WorkoutTemplate> _workoutTemplates = [];
 
-
-
   void _assignWorkoutTemplate() async {
     if (_selectedWorkoutTemplateId != null) {
       try {
-        await _workoutService.assignWorkoutTemplate(widget.member.id, _selectedWorkoutTemplateId!);
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Workout Template Assigned')));
+        await _workoutService.assignWorkoutTemplate(
+            widget.member.id, _selectedWorkoutTemplateId!);
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Workout Template Assigned')));
       } catch (error) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to assign workout template: $error')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text('Failed to assign workout template: $error')));
       }
     }
   }
@@ -119,7 +125,10 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
         title: Text(widget.member.name),
         actions: [
           IconButton(
-            icon: Icon(_isEditing ? Icons.save : Icons.edit, size: 40,),
+            icon: Icon(
+              _isEditing ? Icons.save : Icons.edit,
+              size: 40,
+            ),
             onPressed: _isEditing ? _saveChanges : _toggleEditing,
           ),
         ],
@@ -143,38 +152,54 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
                     children: [
                       Expanded(
                         child: Center(
-                          child: _image == null
-                              ? Text('No image selected.')
-                              : Image.file(_image!),
+                          child: CachedNetworkImage(
+                            progressIndicatorBuilder:
+                                (context, url, progress) => Center(
+                              child: CircularProgressIndicator(
+                                value: progress.progress,
+                              ),
+                            ),
+                            imageUrl: _imgUrl!,
+                            errorWidget: (context, url, error) =>
+                                const Icon(Icons.error),
+                            fadeInDuration: const Duration(milliseconds: 500),
+                            fadeOutDuration: const Duration(milliseconds: 500),
+                          ),
                         ),
                       ),
                       ElevatedButton(
                         onPressed: () async {
-                          final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+                          final image = await ImagePicker()
+                              .pickImage(source: ImageSource.gallery);
                           if (image != null) {
                             _image = File(image.path);
                           }
                         },
-                        child: Text('Select image'),
+                        child: const Text('Select image'),
                       ),
                     ],
                   ),
                 ),
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               Wrap(
                 spacing: 16.0,
                 runSpacing: 16.0,
                 children: [
-                  _buildSection(context, 'Personal Information', _buildPersonalInfoTable()),
-                  _buildSection(context, 'Membership Details', _buildMembershipDetailsTable()),
-                  _buildSection(context, 'Package Details', _buildPackageDetails()),
-                  _buildSection(context, 'Diet Assignment', _buildDietAssignmentSection()),
-                  _buildSection(context, 'Workout Assignment', _buildWorkoutAssignmentSection()),
+                  _buildSection(context, 'Personal Information',
+                      _buildPersonalInfoTable()),
+                  _buildSection(context, 'Membership Details',
+                      _buildMembershipDetailsTable()),
+                  _buildSection(
+                      context, 'Package Details', _buildPackageDetails()),
+                  _buildSection(context, 'Diet Assignment',
+                      _buildDietAssignmentSection()),
+                  _buildSection(context, 'Workout Assignment',
+                      _buildWorkoutAssignmentSection()),
                 ],
               ),
-              SizedBox(height: 16),
-              Container(
+              const SizedBox(height: 16),
+              SizedBox(
                 width: MediaQuery.of(context).size.width,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -184,25 +209,33 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => PaymentHistoryPage(member: widget.member),
+                            builder: (context) =>
+                                PaymentHistoryPage(member: widget.member),
                           ),
                         );
                       },
-                      child: Text('View Payment History', style: TextStyle(color: Colors.white)),
-                      style: ElevatedButton.styleFrom(backgroundColor: appLightGreen),
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: appLightGreen),
+                      child: const Text('View Payment History',
+                          style: TextStyle(color: Colors.white)),
                     ),
-                    SizedBox(width: 10,),
+                    const SizedBox(
+                      width: 10,
+                    ),
                     ElevatedButton(
                       onPressed: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => MemberAttendancePage(memberId: widget.member.id),
+                            builder: (context) => MemberAttendancePage(
+                                memberId: widget.member.id),
                           ),
                         );
                       },
-                      child: Text('View Attendance History', style: TextStyle(color: Colors.white)),
-                      style: ElevatedButton.styleFrom(backgroundColor: appLightGreen),
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: appLightGreen),
+                      child: const Text('View Attendance History',
+                          style: TextStyle(color: Colors.white)),
                     ),
                   ],
                 ),
@@ -216,7 +249,8 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
 
   Widget _buildSection(BuildContext context, String title, Widget content) {
     double screenWidth = MediaQuery.of(context).size.width;
-    double sectionWidth = screenWidth > 600 ? screenWidth / 2 - 32 : screenWidth;
+    double sectionWidth =
+        screenWidth > 600 ? screenWidth / 2 - 32 : screenWidth;
 
     return Container(
       width: sectionWidth,
@@ -236,7 +270,7 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
               color: appLightGreen,
             ),
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           content,
         ],
       ),
@@ -247,10 +281,12 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
     return _buildDetailTable([
       _buildEditableDetailRow(Icons.person, 'Name', _nameController),
       _buildEditableLevelRow(Icons.star, 'User Level'),
-      _buildEditableDetailRow(Icons.cake, 'Age', _ageController, isNumber: true),
+      _buildEditableDetailRow(Icons.cake, 'Age', _ageController,
+          isNumber: true),
       _buildEditableDetailRow(Icons.wc, 'Gender', _genderController),
       _buildEditableDetailRow(Icons.email, 'Email', _emailController),
-      _buildEditableDetailRow(Icons.phone, 'Phone Number', _phoneNumberController),
+      _buildEditableDetailRow(
+          Icons.phone, 'Phone Number', _phoneNumberController),
       _buildEditableDetailRow(Icons.home, 'Address', _addressController),
     ]);
   }
@@ -260,68 +296,80 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildDatePickerRow(Icons.calendar_today, 'Membership Start Date', _membershipStartDateController),
-          _buildDatePickerRow(Icons.calendar_today, 'Membership End Date', _membershipEndDateController),
+          _buildDatePickerRow(Icons.calendar_today, 'Membership Start Date',
+              _membershipStartDateController),
+          _buildDatePickerRow(Icons.calendar_today, 'Membership End Date',
+              _membershipEndDateController),
         ],
       );
     } else {
       return _buildDetailTable([
-        _buildDetailRow(Icons.access_time, 'Membership Duration', widget.member.getMembershipDuration()),
-        _buildDetailRow(Icons.calendar_today, 'Membership Start Date', _formatDate(widget.member.membershipStartDate)),
-        _buildDetailRow(Icons.calendar_today, 'Membership End Date', _formatDate(widget.member.membershipEndDate)),
+        _buildDetailRow(Icons.access_time, 'Membership Duration',
+            widget.member.getMembershipDuration()),
+        _buildDetailRow(Icons.calendar_today, 'Membership Start Date',
+            _formatDate(widget.member.membershipStartDate)),
+        _buildDetailRow(Icons.calendar_today, 'Membership End Date',
+            _formatDate(widget.member.membershipEndDate)),
       ]);
     }
   }
+
   Widget _buildEditableLevelRow(IconData icon, String label) {
     return Row(
       children: [
         Icon(icon, color: appLightGreen),
-        SizedBox(width: 8),
+        const SizedBox(width: 8),
         Text(
           '$label: ',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+          style:
+              const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
-        (_isEditing)?Expanded(
-          child: DropdownButtonFormField<MembershipLevel>(
-            value: _selectedLevel,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(
-                borderSide: BorderSide(color: appLightGreen),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: appLightGreen),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: appLightGreen),
-              ),
-              fillColor: Colors.white10,),
-            items: MembershipLevel.values.map((MembershipLevel level) {
-              return DropdownMenuItem<MembershipLevel>(
-                value: level,
-                child: Text(level.toString().split('.').last),
-              );
-            }).toList(),
-            onChanged: (value) {
-              setState(() {
-                _selectedLevel = value;
-              });
-            },
-          ),
-        ):Text(widget.member.level.name),
+        (_isEditing)
+            ? Expanded(
+                child: DropdownButtonFormField<MembershipLevel>(
+                  value: _selectedLevel,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(color: appLightGreen),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: appLightGreen),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: appLightGreen),
+                    ),
+                    fillColor: Colors.white10,
+                  ),
+                  items: MembershipLevel.values.map((MembershipLevel level) {
+                    return DropdownMenuItem<MembershipLevel>(
+                      value: level,
+                      child: Text(level.toString().split('.').last),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedLevel = value;
+                    });
+                  },
+                ),
+              )
+            : Text(widget.member.level.name),
       ],
     );
   }
 
-  Widget _buildDatePickerRow(IconData icon, String label, TextEditingController controller) {
+  Widget _buildDatePickerRow(
+      IconData icon, String label, TextEditingController controller) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
         children: [
           Icon(icon, color: appLightGreen),
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
           Text(
             '$label: ',
-            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+            style: const TextStyle(
+                fontWeight: FontWeight.bold, color: Colors.white),
           ),
           Expanded(
             child: InkWell(
@@ -330,7 +378,8 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
                 child: TextField(
                   controller: controller,
                   decoration: InputDecoration(
-                    contentPadding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
+                    contentPadding: const EdgeInsets.symmetric(
+                        vertical: 8.0, horizontal: 12.0),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8.0),
                       borderSide: BorderSide(color: appLightGreen, width: 1.0),
@@ -344,7 +393,7 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
                       borderSide: BorderSide(color: appLightGreen, width: 1.0),
                     ),
                   ),
-                  style: TextStyle(color: Colors.white70),
+                  style: const TextStyle(color: Colors.white70),
                 ),
               ),
             ),
@@ -354,7 +403,8 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
     );
   }
 
-  void _selectDate(BuildContext context, TextEditingController controller) async {
+  void _selectDate(
+      BuildContext context, TextEditingController controller) async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
@@ -370,40 +420,48 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
 
   Widget _buildPackageDetails() {
     return (_isEditing)
-        ?DropdownButtonFormField<Package>(
-      value: _selectedPackage,
-      hint: Text('Select Package'),
-      onChanged: (Package? newValue) {
-        setState(() {
-          _selectedPackage = newValue!;
-        });
-      },
-      items: _packages.map((Package package) {
-        return DropdownMenuItem<Package>(
-          value: package,
-          child: Text('${package.level} - ${package.getReadableDuration()} - \₹${package.amount}'),
-        );
-      }).toList(),
-      decoration: InputDecoration(
-        border: OutlineInputBorder(
-          borderSide: BorderSide(color: appLightGreen),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: appLightGreen),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: appLightGreen),
-        ),
-        fillColor: Colors.white10,
-      ),
-    )
-        :_buildDetailTable([
-      _buildDetailRow(Icons.star, 'Package ID', widget.member.currentPackage?.packageID ?? 'N/A'),
-      _buildDetailRow(Icons.timer, 'Duration', '${widget.member.currentPackage?.packageDuration ?? 'N/A'} days'),
-      _buildDetailRow(Icons.label, 'Level', widget.member.currentPackage?.level ?? 'N/A'),
-      _buildDetailRow(Icons.monetization_on, 'Amount',
-          widget.member.currentPackage != null ? '\$${widget.member.currentPackage!.amount.toStringAsFixed(2)}' : 'N/A'),
-    ]);
+        ? DropdownButtonFormField<Package>(
+            value: _selectedPackage,
+            hint: const Text('Select Package'),
+            onChanged: (Package? newValue) {
+              setState(() {
+                _selectedPackage = newValue!;
+              });
+            },
+            items: _packages.map((Package package) {
+              return DropdownMenuItem<Package>(
+                value: package,
+                child: Text(
+                    '${package.level} - ${package.getReadableDuration()} - ₹${package.amount}'),
+              );
+            }).toList(),
+            decoration: InputDecoration(
+              border: OutlineInputBorder(
+                borderSide: BorderSide(color: appLightGreen),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: appLightGreen),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: appLightGreen),
+              ),
+              fillColor: Colors.white10,
+            ),
+          )
+        : _buildDetailTable([
+            _buildDetailRow(Icons.star, 'Package ID',
+                widget.member.currentPackage?.packageID ?? 'N/A'),
+            _buildDetailRow(Icons.timer, 'Duration',
+                '${widget.member.currentPackage?.packageDuration ?? 'N/A'} days'),
+            _buildDetailRow(Icons.label, 'Level',
+                widget.member.currentPackage?.level ?? 'N/A'),
+            _buildDetailRow(
+                Icons.monetization_on,
+                'Amount',
+                widget.member.currentPackage != null
+                    ? '\$${widget.member.currentPackage!.amount.toStringAsFixed(2)}'
+                    : 'N/A'),
+          ]);
   }
 
   String _formatDate(DateTime? date) {
@@ -424,15 +482,16 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
       child: Row(
         children: [
           Icon(icon, color: appLightGreen),
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
           Text(
             '$label: ',
-            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+            style: const TextStyle(
+                fontWeight: FontWeight.bold, color: Colors.white),
           ),
           Expanded(
             child: Text(
               value,
-              style: TextStyle(color: Colors.white70),
+              style: const TextStyle(color: Colors.white70),
             ),
           ),
         ],
@@ -440,46 +499,51 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
     );
   }
 
-
-
-  Widget _buildEditableDetailRow(IconData icon, String label, TextEditingController controller, {bool isNumber = false}) {
+  Widget _buildEditableDetailRow(
+      IconData icon, String label, TextEditingController controller,
+      {bool isNumber = false}) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
         children: [
           Icon(icon, color: appLightGreen),
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
           Text(
             '$label: ',
-            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+            style: const TextStyle(
+                fontWeight: FontWeight.bold, color: Colors.white),
           ),
           Expanded(
             child: _isEditing
                 ? TextField(
-              controller: controller,
-              keyboardType: isNumber ? TextInputType.number : TextInputType.text,
-              decoration: InputDecoration(
-                contentPadding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                  borderSide: BorderSide(color: appLightGreen, width: 1.0),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                  borderSide: BorderSide(color: appLightGreen, width: 1.0),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                  borderSide: BorderSide(color: appLightGreen, width: 1.0),
-                ),
-                fillColor: Colors.white10
-              ),
-              style: TextStyle(color: Colors.white70),
-            )
+                    controller: controller,
+                    keyboardType:
+                        isNumber ? TextInputType.number : TextInputType.text,
+                    decoration: InputDecoration(
+                        contentPadding: const EdgeInsets.symmetric(
+                            vertical: 8.0, horizontal: 12.0),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                          borderSide:
+                              BorderSide(color: appLightGreen, width: 1.0),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                          borderSide:
+                              BorderSide(color: appLightGreen, width: 1.0),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                          borderSide:
+                              BorderSide(color: appLightGreen, width: 1.0),
+                        ),
+                        fillColor: Colors.white10),
+                    style: const TextStyle(color: Colors.white70),
+                  )
                 : Text(
-              controller.text,
-              style: TextStyle(color: Colors.white70),
-            ),
+                    controller.text,
+                    style: const TextStyle(color: Colors.white70),
+                  ),
           ),
         ],
       ),
@@ -490,36 +554,36 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-          DropdownButtonFormField<String>(
-            decoration: InputDecoration(
-              labelText: 'Select Diet Template',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8.0),
-                borderSide: BorderSide(color: appLightGreen, width: 1.0),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8.0),
-                borderSide: BorderSide(color: appLightGreen, width: 1.0),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8.0),
-                borderSide: BorderSide(color: appLightGreen, width: 1.0),
-              ),
+        DropdownButtonFormField<String>(
+          decoration: InputDecoration(
+            labelText: 'Select Diet Template',
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8.0),
+              borderSide: BorderSide(color: appLightGreen, width: 1.0),
             ),
-            value: _selectedDietTemplateId,
-            onChanged: (newValue) {
-              setState(() {
-                _selectedDietTemplateId = newValue;
-              });
-            },
-            items: _dietTemplates.map((template) {
-              return DropdownMenuItem<String>(
-                value: template.templateID,
-                child: Text(template.templateName),
-              );
-            }).toList(),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8.0),
+              borderSide: BorderSide(color: appLightGreen, width: 1.0),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8.0),
+              borderSide: BorderSide(color: appLightGreen, width: 1.0),
+            ),
           ),
-        SizedBox(height: 16),
+          value: _selectedDietTemplateId,
+          onChanged: (newValue) {
+            setState(() {
+              _selectedDietTemplateId = newValue;
+            });
+          },
+          items: _dietTemplates.map((template) {
+            return DropdownMenuItem<String>(
+              value: template.templateID,
+              child: Text(template.templateName),
+            );
+          }).toList(),
+        ),
+        const SizedBox(height: 16),
         Text(
           'Selected Diet:',
           style: TextStyle(
@@ -528,43 +592,50 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
             color: appLightGreen,
           ),
         ),
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         Text(
-          _dietTemplates.firstWhere(
-                (template) => template.templateID == widget.member.dietTemplateID,
-            orElse: () => DietTemplate(templateID: '', templateName: 'None Selected', diets: []),
-          ).templateName,
-          style: TextStyle(color: Colors.white70),
+          _dietTemplates
+              .firstWhere(
+                (template) =>
+                    template.templateID == widget.member.dietTemplateID,
+                orElse: () => DietTemplate(
+                    templateID: '', templateName: 'None Selected', diets: []),
+              )
+              .templateName,
+          style: const TextStyle(color: Colors.white70),
         ),
         // if (_isEditing)
-          ElevatedButton(
-            onPressed: () async {
-              if (_selectedDietTemplateId != null) {
-                try {
-                  await _memberService.updateDietTemplateId(widget.member.id, _selectedDietTemplateId!);
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text('Diet template assigned successfully'),
-                    backgroundColor: Colors.green,
-                  ));
-                } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text('Failed to assign diet template: $e'),
-                    backgroundColor: Colors.red,
-                  ));
-                }
-              } else {
+        ElevatedButton(
+          onPressed: () async {
+            if (_selectedDietTemplateId != null) {
+              try {
+                await _memberService.updateDietTemplateId(
+                    widget.member.id, _selectedDietTemplateId!);
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                  content: Text('Diet template assigned successfully'),
+                  backgroundColor: Colors.green,
+                ));
+              } catch (e) {
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text('Please select a diet template'),
-                  backgroundColor: Colors.orange,
+                  content: Text('Failed to assign diet template: $e'),
+                  backgroundColor: Colors.red,
                 ));
               }
-            },
-            child: Text('Assign Diet', style: TextStyle(color: Colors.white)),
-            style: ElevatedButton.styleFrom(backgroundColor: appLightGreen),
-          ),
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                content: Text('Please select a diet template'),
+                backgroundColor: Colors.orange,
+              ));
+            }
+          },
+          style: ElevatedButton.styleFrom(backgroundColor: appLightGreen),
+          child:
+              const Text('Assign Diet', style: TextStyle(color: Colors.white)),
+        ),
       ],
     );
   }
+
   Widget _buildWorkoutAssignmentSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -598,7 +669,7 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
             );
           }).toList(),
         ),
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
         Text(
           'Selected Workout template:',
           style: TextStyle(
@@ -607,14 +678,15 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
             color: appLightGreen,
           ),
         ),
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         // if (_isEditing)
         ElevatedButton(
           onPressed: () async {
             if (_selectedWorkoutTemplateId != null) {
               try {
-                await _workoutService.assignWorkoutTemplate(widget.member.id, _selectedWorkoutTemplateId!);
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                await _workoutService.assignWorkoutTemplate(
+                    widget.member.id, _selectedWorkoutTemplateId!);
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                   content: Text('Workout assigned successfully'),
                   backgroundColor: Colors.green,
                 ));
@@ -625,18 +697,20 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
                 ));
               }
             } else {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                 content: Text('Please select a workout template'),
                 backgroundColor: Colors.orange,
               ));
             }
           },
-          child: Text('Assign Workouts', style: TextStyle(color: Colors.white)),
           style: ElevatedButton.styleFrom(backgroundColor: appLightGreen),
+          child: const Text('Assign Workouts',
+              style: TextStyle(color: Colors.white)),
         ),
       ],
     );
   }
+
   Future<void> _fetchPackages() async {
     try {
       PackageService packageService = PackageService();
@@ -670,18 +744,21 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
       // widget.member.imageUrl=downloadUrl;
       // Update the member object with new details
       widget.member.name = _nameController.text;
-      widget.member.level= _selectedLevel ?? widget.member.level;
+      widget.member.level = _selectedLevel ?? widget.member.level;
       widget.member.age = int.parse(_ageController.text);
       widget.member.gender = _genderController.text;
       widget.member.email = _emailController.text;
       widget.member.phoneNumber = _phoneNumberController.text;
       widget.member.address = _addressController.text;
-      widget.member.membershipStartDate = DateTime.parse(_membershipStartDateController.text);
-      widget.member.membershipEndDate = DateTime.parse(_membershipEndDateController.text);
+      widget.member.membershipStartDate =
+          DateTime.parse(_membershipStartDateController.text);
+      widget.member.membershipEndDate =
+          DateTime.parse(_membershipEndDateController.text);
 
       // Check if package is changed
-      bool packageChanged = _selectedPackage!=null;
-      widget.member.currentPackage = _selectedPackage ?? widget.member.currentPackage;
+      bool packageChanged = _selectedPackage != null;
+      widget.member.currentPackage =
+          _selectedPackage ?? widget.member.currentPackage;
 
       if (packageChanged) {
         // Show confirmation dialog
@@ -689,20 +766,22 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text('Payment History Addition'),
-              content: Text('Do you want to add payment history for the new package?'),
+              title: const Text('Payment History Addition'),
+              content: const Text(
+                  'Do you want to add payment history for the new package?'),
               actions: <Widget>[
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).pop(false); // Return false if not confirmed
+                    Navigator.of(context)
+                        .pop(false); // Return false if not confirmed
                   },
-                  child: Text('No'),
+                  child: const Text('No'),
                 ),
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pop(true); // Return true if confirmed
                   },
-                  child: Text('Yes'),
+                  child: const Text('Yes'),
                 ),
               ],
             );
@@ -711,14 +790,15 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
 
         if (confirmPurchaseHistory == true) {
           // Call service to add purchase history
-          await _addPurchaseOrderHistory(widget.member.membershipStartDate, widget.member.membershipEndDate);
+          await _addPurchaseOrderHistory(widget.member.membershipStartDate,
+              widget.member.membershipEndDate);
         }
       }
 
       // Call the service to update member details in the backend
       await _memberService.updateMember(widget.member);
 
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('Member details updated successfully'),
         backgroundColor: Colors.green,
       ));
@@ -734,21 +814,27 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
     }
   }
 
-  Future<void> _addPurchaseOrderHistory(DateTime startDate, DateTime endDate) async {
+  Future<void> _addPurchaseOrderHistory(
+      DateTime startDate, DateTime endDate) async {
     try {
       // Create a new purchase order history object
       PurchaseOrder purchaseOrder = PurchaseOrder(
         memberId: widget.member.id,
         gymMemberID: widget.member.gymMemberID,
-        packageId: _selectedPackage!.packageID??widget.member.currentPackage!.packageID??"",
+        packageId: _selectedPackage!.packageID ??
+            widget.member.currentPackage!.packageID ??
+            "",
         timeOfPO: DateTime.now(),
-        amountPaid: _selectedPackage!.amount, membershipStartDate: startDate, membershipEndDate: endDate, purchaseOrderId: '',
+        amountPaid: _selectedPackage!.amount,
+        membershipStartDate: startDate,
+        membershipEndDate: endDate,
+        purchaseOrderId: '',
       );
 
       // Call the service to add purchase order history
       await PurchaseOrderService().addPurchaseOrder(purchaseOrder);
 
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('Purchase history added successfully'),
         backgroundColor: Colors.green,
       ));
@@ -759,5 +845,4 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
       ));
     }
   }
-
 }

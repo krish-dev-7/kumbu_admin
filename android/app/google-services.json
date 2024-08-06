@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "84765251346-l98b0f1bknfvlkkn21t52utqe92npel4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.kumbu_admin",
+            "certificate_hash": "b7a774db763d1f03e3d949affb13c5c14b3dcb9d"
+          }
+        },
+        {
           "client_id": "84765251346-gp7hsnhgucffpm0a6o5beik3pj5a9o45.apps.googleusercontent.com",
           "client_type": 3
         }
