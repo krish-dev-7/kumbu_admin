@@ -1,4 +1,4 @@
-// import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:kumbu_admin/Common/ThemeData.dart';
 import 'package:kumbu_admin/Screens/AttendancePage.dart';
@@ -16,16 +16,12 @@ import 'Screens/workouts/WokoutTemplateListScreen.dart';
 import 'firebase_options.dart';
 import 'Screens/MembershipRequestPage.dart';
 
-void main()  async {
-  // WidgetsFlutterBinding.ensureInitialized();
-  // // FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-  // await Firebase.initializeApp(
-  //   options: DefaultFirebaseOptions.currentPlatform,
-  // );
-
-  await UserService().getUserByEmail("krish0cyber@gmail.com");
-
-  print("USER : ${user?.name}");
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  // FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   runApp(MaterialApp(
     title: 'Kumbu Admin App',
