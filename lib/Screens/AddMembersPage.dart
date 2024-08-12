@@ -37,6 +37,7 @@ class _AddMemberPageState extends State<AddMemberPage> {
   final TextEditingController membershipEndDateController =
       TextEditingController();
   final TextEditingController packageController = TextEditingController();
+  bool isPT = false;
 
   void initializeControllersForTesting() {
     imageUrlController.text = "";
@@ -74,7 +75,7 @@ class _AddMemberPageState extends State<AddMemberPage> {
   void initState() {
     super.initState();
     _fetchPackages();
-    initializeControllersForTesting(); // todo: Remove after testing
+    // initializeControllersForTesting();
   }
 
   Future<void> _fetchPackages() async {
@@ -153,6 +154,19 @@ class _AddMemberPageState extends State<AddMemberPage> {
               context, 'Membership Start Date', membershipStartDateController),
           _buildDateField(
               context, 'Membership End Date', membershipEndDateController),
+          Row(
+            children: [
+              Checkbox(
+                value: isPT,
+                onChanged: (bool? value) {
+                  setState(() {
+                    isPT = value ?? false;
+                  });
+                },
+              ),
+              Text("Personal training"),
+            ],
+          ),
           const SizedBox(height: 20),
           ElevatedButton(
             onPressed: () {
@@ -183,6 +197,7 @@ class _AddMemberPageState extends State<AddMemberPage> {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -228,6 +243,20 @@ class _AddMemberPageState extends State<AddMemberPage> {
                         ),
                       ),
                       const SizedBox(height: 20),
+                      Row(
+                        children: [
+                          Checkbox(
+                            value: isPT,
+                            onChanged: (bool? value) {
+                              setState(() {
+                                isPT = value ?? false;
+                              });
+                            },
+                          ),
+                          Text("Personal Training)"),
+                        ],
+                      ),
+
                       _buildPackageDropdown(
                           context), // Package selection dropdown
                       _buildDateField(context, 'Membership Start Date',
@@ -289,7 +318,7 @@ class _AddMemberPageState extends State<AddMemberPage> {
           controller: controller,
           decoration: InputDecoration(
             labelText: label,
-            labelStyle: const TextStyle(color: Colors.white70),
+            labelStyle:  TextStyle(color: appLightGreen),
             enabledBorder: OutlineInputBorder(
               borderSide: BorderSide(color: appLightGreen),
             ),
@@ -356,7 +385,7 @@ class _AddMemberPageState extends State<AddMemberPage> {
               decoration: InputDecoration(
                 labelText: label,
                 suffixIcon: Icon(Icons.calendar_today, color: appLightGreen),
-                labelStyle: const TextStyle(color: Colors.white70),
+                labelStyle: TextStyle(color: appLightGreen),
                 enabledBorder: OutlineInputBorder(
                   borderSide: BorderSide(color: appLightGreen),
                 ),
@@ -391,22 +420,26 @@ class _AddMemberPageState extends State<AddMemberPage> {
   void _saveMemberDetails() async {
     // Validate inputs and save member details
 
-    if (_image == null) return;
+    // if (_image == null) return;
 
     try {
       // Upload image to Firebase Storage
-      final Reference storageRef = FirebaseStorage.instance
-          .ref()
-          .child('profilePic')
-          .child('${emailController.text}.jpg');
+      String imageUrl ="";
+      if (_image != null) {
+        final Reference storageRef = FirebaseStorage.instance
+            .ref()
+            .child('profilePic')
+            .child('${emailController.text}.jpg');
 
-      final UploadTask uploadTask = storageRef.putFile(_image!);
-      final TaskSnapshot storageSnapshot = await uploadTask;
+        final UploadTask uploadTask = storageRef.putFile(_image!);
+        final TaskSnapshot storageSnapshot = await uploadTask;
 
-      // Get the download URL of the uploaded image
-      final String downloadUrl = await storageSnapshot.ref.getDownloadURL();
+        // Get the download URL of the uploaded image
+        final String downloadUrl = await storageSnapshot.ref.getDownloadURL();
+        imageUrl = downloadUrl;
+      }
 
-      String imageUrl = downloadUrl;
+
       String name = nameController.text;
       int age = int.tryParse(ageController.text) ??
           0; // Handle parsing error as needed
@@ -421,6 +454,7 @@ class _AddMemberPageState extends State<AddMemberPage> {
       // Create a new GymMember object or update existing member
       GymMember newMember = GymMember(
         imageUrl: imageUrl,
+        isPT: isPT,
         name: name,
         age: age,
         gender: gender,
@@ -438,11 +472,16 @@ class _AddMemberPageState extends State<AddMemberPage> {
         daysAttended: 0, // Example: Set days attended
       );
 
+      print(user?.role);
+      if(user?.role=="Admin"){
       _memberService.addMember(
           newMember); // Await if you need to handle response or errors
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Member added successfully')),
-      );
+      );}
+      else{
+        _addMemberRequest(MembershipRequest.fromGymMember(newMember, user!.id, user!.name));
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to add member: $e')),

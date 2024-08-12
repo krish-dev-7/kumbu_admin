@@ -148,7 +148,7 @@ class _AttendancePageState extends State<AttendancePage> {
                             "$membershipEndDays days",
                             style: TextStyle(
                               fontSize: 16,
-                              color: isMembershipEndingSoon ? Colors.red : Colors.white,
+                              color: isMembershipEndingSoon ? Colors.red : appTextColor,
                               fontWeight: isMembershipEndingSoon ? FontWeight.bold : FontWeight.normal,
                             ),
                           ),

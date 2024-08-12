@@ -15,6 +15,7 @@ class GymMember {
   final String id;
   final int gymMemberID;
    String name;
+   bool isPT;
    int age;
    String gender;
    Package? currentPackage;
@@ -47,6 +48,7 @@ class GymMember {
     required this.address,
     this.imageUrl,
     this.isActive = true,
+    this.isPT=false,
     this.purchaseOrderHistories = const [],
     this.dietTemplateID = "",
     required this.daysAttended,
@@ -80,6 +82,7 @@ class GymMember {
   Map<String, dynamic> toMap() {
     return {
       'gymMemberID': gymMemberID,
+      'isPT':isPT,
       'name': name,
       'age': age,
       'gender': gender,
@@ -104,6 +107,7 @@ class GymMember {
     return GymMember(
       id: map['_id'],
       gymMemberID: map['gymMemberID'],
+      isPT: map['isPT'],
       name: map['name'],
       age: map['age'],
       gender: map['gender'],

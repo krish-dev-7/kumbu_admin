@@ -68,6 +68,7 @@ class MemberService {
         'Content-Type': 'application/json',
       },
       body: json.encode({
+        'imageUrl':member.imageUrl,
         'name': member.name,
         'age': member.age,
         'gender': member.gender,
@@ -105,7 +106,7 @@ class MemberService {
       throw Exception('Failed to update membership details');
     }
   }
-  Future<MemberResponse> getMembers({int page = 1, int limit = 20, String search = ''}) async {
+  Future<MemberResponse> getMembers({int page = 1, int limit = 30, String search = ''}) async {
     final response = await http.get(
       Uri.parse('$baseUrl/api/members?page=$page&limit=$limit&search=$search'),
     );
@@ -116,6 +117,14 @@ class MemberService {
     } else {
       print(search +" searched -> "+ response.body);
       throw Exception('Failed to load members');
+    }
+  }
+  Future<void> deleteMemberById(String memberId) async {
+    final url = Uri.parse('$baseUrl/api/members/$memberId');
+    final response = await http.delete(url);
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to delete the member');
     }
   }
 }

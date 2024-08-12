@@ -15,7 +15,7 @@ class QuotationPage extends StatefulWidget {
 class _QuotationPageState extends State<QuotationPage> {
   final QuotationService _quotationService = QuotationService();
   late Future<List<Quotation>> _quotationsFuture;
-  bool showUnapproved = true;
+  bool showUnapproved = false;
 
   @override
   void initState() {
@@ -61,33 +61,33 @@ class _QuotationPageState extends State<QuotationPage> {
 
             return Column(
               children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        showUnapproved ? 'Unapproved' : 'Unpaid Approvals',
-                        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 18),
-                      ),
-                      SizedBox(width: 15,),
-                      Transform.scale(
-                        scale: 1.5, // Adjust the scale value as needed
-                        child: Switch(
-                          value: showUnapproved,
-                          onChanged: (value) {
-                            _toggleQuotations();
-                          },
-                          activeColor: appLightGreen,
-                          inactiveThumbColor: appDarkGreen,
-                          inactiveTrackColor: appDarkGreen.withOpacity(0.5),
-                          activeTrackColor: appLightGreen.withOpacity(0.5),
-                        ),
-                      )
-
-                    ],
-                  ),
-                ),
+                // Padding(
+                //   padding: const EdgeInsets.all(8.0),
+                //   child: Row(
+                //     mainAxisAlignment: MainAxisAlignment.center,
+                //     children: [
+                //       Text(
+                //         showUnapproved ? 'Unapproved' : 'Unpaid Approvals',
+                //         style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 18),
+                //       ),
+                //       SizedBox(width: 15,),
+                //       Transform.scale(
+                //         scale: 1.5, // Adjust the scale value as needed
+                //         child: Switch(
+                //           value: showUnapproved,
+                //           onChanged: (value) {
+                //             _toggleQuotations();
+                //           },
+                //           activeColor: appLightGreen,
+                //           inactiveThumbColor: appDarkGreen,
+                //           inactiveTrackColor: appDarkGreen.withOpacity(0.5),
+                //           activeTrackColor: appLightGreen.withOpacity(0.5),
+                //         ),
+                //       )
+                //
+                //     ],
+                //   ),
+                // ),
                 Expanded(
                   child: LayoutBuilder(
                     builder: (context, constraints) {
@@ -245,7 +245,7 @@ class _QuotationCardState extends State<QuotationCard> {
                     icon: Icon(Icons.check, color: Colors.white),
                     label: Text('Approve', style: TextStyle(color: Colors.white)),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: appDarkGreen, // Background color
+                      backgroundColor: Colors.green[800], // Background color
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
                       ),
@@ -274,7 +274,7 @@ class _QuotationCardState extends State<QuotationCard> {
                     icon: Icon(Icons.check, color: Colors.white),
                     label: Text('Paid', style: TextStyle(color: Colors.white)),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: appDarkGreen, // Background color
+                      backgroundColor: Colors.green[800], // Background color
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
                       ),

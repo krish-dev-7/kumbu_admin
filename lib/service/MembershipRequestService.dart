@@ -62,7 +62,7 @@ class MembershipRequestService{
 
   Future<void> approveRequest(String id) async {
     final response = await http.post(Uri.parse('$baseUrl/membershipRequests/$id/approve'));
-    print("MembershipRequestService @65 ${response.body}");
+    // print("MembershipRequestService @65 ${response.body}");
     if (response.statusCode != 200) {
       throw Exception('Failed to approve membership request');
     }
@@ -70,6 +70,8 @@ class MembershipRequestService{
 
   Future<void> rejectRequest(String id) async {
     final response = await http.delete(Uri.parse('$baseUrl/membershipRequests/$id/reject'));
+    print( response.request?.headers);
+    print(response.statusCode);
     if (response.statusCode != 200) {
       throw Exception('Failed to reject membership request');
     }

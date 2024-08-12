@@ -24,6 +24,17 @@ class Quotation {
   });
 
   factory Quotation.fromJson(Map<String, dynamic> json) {
+    if(json['requester']==null)
+      return Quotation(
+        quotationID: json['_id'],
+        requesterName: "Deleted User",
+        requesterID: -1,
+        requesterUID: "Deleted User",
+        requesterNumber: "Deleted User",
+        package: Package.fromJson(json['package']), // Parse package from JSON
+        isApproved: json['isApproved'],
+        isPaid: json['isPaid'],
+      );
     return Quotation(
       quotationID: json['_id'],
       requesterName: json['requester']['name'],

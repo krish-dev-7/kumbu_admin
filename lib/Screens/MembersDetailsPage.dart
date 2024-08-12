@@ -2,12 +2,14 @@ import 'dart:io';
 
 // import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:kumbu_admin/Common/config.dart';
 import 'package:kumbu_admin/Screens/MembersAttendancePage.dart';
 import 'package:kumbu_admin/service/DietTemplateService.dart';
+import 'package:percent_indicator/linear_percent_indicator.dart';
 import '../Models/DietTemplate.dart';
 import '../Models/Member.dart'; // Update path as per your project structure
 import 'package:kumbu_admin/Common/ThemeData.dart';
@@ -50,8 +52,10 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
   late TextEditingController _addressController;
   late TextEditingController _membershipStartDateController;
   late TextEditingController _membershipEndDateController;
+  final TextEditingController imageUrlController = TextEditingController();
 
   Package? _selectedPackage;
+  late bool isPT;
 
   @override
   void initState() {
@@ -64,6 +68,8 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
     _nameController = TextEditingController(text: widget.member.name);
     _selectedLevel = widget.member.level;
     _imgUrl = widget.member.imageUrl;
+
+
     _ageController = TextEditingController(text: widget.member.age.toString());
     _genderController = TextEditingController(text: widget.member.gender);
     _emailController = TextEditingController(text: widget.member.email);
@@ -74,6 +80,7 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
         text: _formatDate(widget.member.membershipStartDate));
     _membershipEndDateController = TextEditingController(
         text: _formatDate(widget.member.membershipEndDate));
+    isPT = widget.member.isPT;
     // _selectedPackage = widget.member.currentPackage!;
   }
 
@@ -86,6 +93,25 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
       });
     } catch (e) {
       print('Failed to fetch diet templates: $e');
+    }
+  }
+
+  double calculateProgress(DateTime startDate, DateTime endDate) {
+    if (endDate.isBefore(startDate)) {
+      throw ArgumentError('End date must be after start date');
+    }
+
+    final now = DateTime.now();
+    final totalDuration = endDate.difference(startDate).inMilliseconds;
+
+    final elapsedDuration = now.difference(startDate).inMilliseconds;
+
+    if (elapsedDuration <= 0) {
+      return 0.0;
+    } else if (elapsedDuration >= totalDuration) {
+      return 1.0;
+    } else {
+      return elapsedDuration / totalDuration;
     }
   }
 
@@ -118,12 +144,25 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
     }
   }
 
+  Future getImage() async {
+    final pickedFile =
+    await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path);
+        imageUrlController.text =
+            pickedFile.path; // Update controller with image path
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.member.name),
         actions: [
+          if(user?.role=="Admin")
           IconButton(
             icon: Icon(
               _isEditing ? Icons.save : Icons.edit,
@@ -137,45 +176,40 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+            // crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Container(
-                height: 150,
-                width: 300,
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.black),
-                  borderRadius: BorderRadius.circular(20),
-                ),
+              GestureDetector(
+                onTap: getImage,
                 child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  child: Stack(
                     children: [
-                      Expanded(
-                        child: Center(
-                          child: CachedNetworkImage(
-                            progressIndicatorBuilder:
-                                (context, url, progress) => Center(
-                              child: CircularProgressIndicator(
-                                value: progress.progress,
-                              ),
+                      CircleAvatar(
+                        radius: 60,
+                        backgroundImage: _image != null ? FileImage(_image!) : null,
+                        child: widget.member.imageUrl != null? CachedNetworkImage(
+                          progressIndicatorBuilder:
+                              (context, url, progress) => Center(
+                            child: CircularProgressIndicator(
+                              value: progress.progress,
                             ),
-                            imageUrl: _imgUrl!,
-                            errorWidget: (context, url, error) =>
-                                const Icon(Icons.error),
-                            fadeInDuration: const Duration(milliseconds: 500),
-                            fadeOutDuration: const Duration(milliseconds: 500),
                           ),
-                        ),
+                          imageUrl: widget.member.imageUrl!,
+                          errorWidget: (context, url, error) =>
+                          const Icon(Icons.error),
+                          fadeInDuration: const Duration(milliseconds: 500),
+                          fadeOutDuration: const Duration(milliseconds: 500),
+                        ) : _image == null
+                            ? const Icon(Icons.account_circle, size: 60)
+                            : null,
                       ),
-                      ElevatedButton(
-                        onPressed: () async {
-                          final image = await ImagePicker()
-                              .pickImage(source: ImageSource.gallery);
-                          if (image != null) {
-                            _image = File(image.path);
-                          }
-                        },
-                        child: const Text('Select image'),
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: CircleAvatar(
+                          backgroundColor: Colors.grey[200],
+                          child: const Icon(Icons.edit, color: Colors.black),
+                        ),
                       ),
                     ],
                   ),
@@ -190,6 +224,7 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
                       _buildPersonalInfoTable()),
                   _buildSection(context, 'Membership Details',
                       _buildMembershipDetailsTable()),
+
                   _buildSection(
                       context, 'Package Details', _buildPackageDetails()),
                   _buildSection(context, 'Diet Assignment',
@@ -201,7 +236,7 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
               const SizedBox(height: 16),
               SizedBox(
                 width: MediaQuery.of(context).size.width,
-                child: Row(
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     ElevatedButton(
@@ -257,6 +292,10 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
       decoration: BoxDecoration(
         border: Border.all(color: appLightGreen, width: 1),
         borderRadius: BorderRadius.circular(8),
+        color: appContainerColors,
+          boxShadow: [
+            BoxShadow(color: Colors.black54, blurRadius: 5, offset: Offset(2,5))
+          ]
       ),
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -310,8 +349,49 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
             _formatDate(widget.member.membershipStartDate)),
         _buildDetailRow(Icons.calendar_today, 'Membership End Date',
             _formatDate(widget.member.membershipEndDate)),
+        SizedBox(height: 30,),
+        _buildMembershipProgressBar(),
       ]);
     }
+  }
+
+  Widget _buildMembershipProgressBar(){
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "${widget.member.getRemainingDays()} days remaining",
+          style: TextStyle(
+              fontSize: 20,
+              color: appMediumColor,
+              fontWeight: FontWeight.w500
+          ),
+        ),
+        SizedBox(height: MediaQuery.of(context).size.height * 0.025,),
+        LinearPercentIndicator(
+          animation: true,
+          animationDuration: 2500,
+          animateFromLastPercent: true,
+          lineHeight: 11,
+          // width: MediaQuery.of(context).size.width/2.5,
+          barRadius: Radius.circular(19),
+          progressColor: appDarkGreen,
+          percent: calculateProgress(widget.member.membershipEndDate.subtract(Duration(days: widget.member.currentPackage!.packageDuration)), widget.member.membershipEndDate),
+        ),
+        SizedBox(height: MediaQuery.of(context).size.height * 0.025,),
+
+        Row(
+          // mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            Text("From : ", style : TextStyle(fontWeight: FontWeight.w600)),
+            Text(_formatDate(widget.member.membershipEndDate.subtract(Duration(days: widget.member.currentPackage!.packageDuration)))),
+            SizedBox(width: MediaQuery.of(context).size.width * 0.07,),
+            Text("To : ", style : TextStyle(fontWeight: FontWeight.w600)),
+            Text(_formatDate(widget.member.membershipEndDate)),
+          ],
+        )
+      ],
+    );
   }
 
   Widget _buildEditableLevelRow(IconData icon, String label) {
@@ -322,7 +402,7 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
         Text(
           '$label: ',
           style:
-              const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+          TextStyle(fontWeight: FontWeight.bold, color: appLightGreen),
         ),
         (_isEditing)
             ? Expanded(
@@ -368,8 +448,8 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
           const SizedBox(width: 8),
           Text(
             '$label: ',
-            style: const TextStyle(
-                fontWeight: FontWeight.bold, color: Colors.white),
+            style: TextStyle(
+                fontWeight: FontWeight.bold, color: appLightGreen),
           ),
           Expanded(
             child: InkWell(
@@ -393,7 +473,7 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
                       borderSide: BorderSide(color: appLightGreen, width: 1.0),
                     ),
                   ),
-                  style: const TextStyle(color: Colors.white70),
+                  style:  TextStyle(color: appLightGreen),
                 ),
               ),
             ),
@@ -420,34 +500,52 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
 
   Widget _buildPackageDetails() {
     return (_isEditing)
-        ? DropdownButtonFormField<Package>(
-            value: _selectedPackage,
-            hint: const Text('Select Package'),
-            onChanged: (Package? newValue) {
-              setState(() {
-                _selectedPackage = newValue!;
-              });
-            },
-            items: _packages.map((Package package) {
-              return DropdownMenuItem<Package>(
-                value: package,
-                child: Text(
-                    '${package.level} - ${package.getReadableDuration()} - ₹${package.amount}'),
-              );
-            }).toList(),
-            decoration: InputDecoration(
-              border: OutlineInputBorder(
-                borderSide: BorderSide(color: appLightGreen),
+        ? Column(
+          children: [
+            DropdownButtonFormField<Package>(
+                value: _selectedPackage,
+                hint: const Text('Select Package'),
+                onChanged: (Package? newValue) {
+                  setState(() {
+                    _selectedPackage = newValue!;
+                  });
+                },
+                items: _packages.map((Package package) {
+                  return DropdownMenuItem<Package>(
+                    value: package,
+                    child: Text(
+                        '${package.level} - ${package.getReadableDuration()} - ₹${package.amount}'),
+                  );
+                }).toList(),
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide(color: appLightGreen),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: appLightGreen),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: appLightGreen),
+                  ),
+                  fillColor: Colors.white10,
+                ),
               ),
-              enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: appLightGreen),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: appLightGreen),
-              ),
-              fillColor: Colors.white10,
-            ),
-          )
+            Row(
+              children: [
+                Checkbox(
+                  value: isPT,
+                  onChanged: (bool? value) {
+                    setState(() {
+                      isPT = value ?? false;
+                    });
+                  },
+                ),
+                Text("Personal Training"),
+              ],
+            )
+
+          ],
+        )
         : _buildDetailTable([
             _buildDetailRow(Icons.star, 'Package ID',
                 widget.member.currentPackage?.packageID ?? 'N/A'),
@@ -461,6 +559,8 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
                 widget.member.currentPackage != null
                     ? '\$${widget.member.currentPackage!.amount.toStringAsFixed(2)}'
                     : 'N/A'),
+      _buildDetailRow(Icons.hiking, 'Personal Training',
+          widget.member.isPT?"Yes" : "No"),
           ]);
   }
 
@@ -485,13 +585,13 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
           const SizedBox(width: 8),
           Text(
             '$label: ',
-            style: const TextStyle(
-                fontWeight: FontWeight.bold, color: Colors.white),
+            style:  TextStyle(
+                fontWeight: FontWeight.bold, color: appLightGreen),
           ),
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(color: Colors.white70),
+              // style:  TextStyle(color: appLightGreen),
             ),
           ),
         ],
@@ -510,8 +610,8 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
           const SizedBox(width: 8),
           Text(
             '$label: ',
-            style: const TextStyle(
-                fontWeight: FontWeight.bold, color: Colors.white),
+            style:  TextStyle(
+                fontWeight: FontWeight.bold, color: appLightGreen),
           ),
           Expanded(
             child: _isEditing
@@ -538,11 +638,11 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
                               BorderSide(color: appLightGreen, width: 1.0),
                         ),
                         fillColor: Colors.white10),
-                    style: const TextStyle(color: Colors.white70),
+                    // style:  TextStyle(color: appLightGreen),
                   )
                 : Text(
                     controller.text,
-                    style: const TextStyle(color: Colors.white70),
+                    // style:  TextStyle(color: appLightGreen),
                   ),
           ),
         ],
@@ -602,9 +702,9 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
                     templateID: '', templateName: 'None Selected', diets: []),
               )
               .templateName,
-          style: const TextStyle(color: Colors.white70),
+          style:  TextStyle(color: appLightGreen),
         ),
-        // if (_isEditing)
+        if (user?.role=="Admin" || user?.role=="Manager")
         ElevatedButton(
           onPressed: () async {
             if (_selectedDietTemplateId != null) {
@@ -680,6 +780,7 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
         ),
         const SizedBox(height: 8),
         // if (_isEditing)
+        if (user?.role=="Admin" || user?.role=="Manager")
         ElevatedButton(
           onPressed: () async {
             if (_selectedWorkoutTemplateId != null) {
@@ -743,9 +844,27 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
 
       // widget.member.imageUrl=downloadUrl;
       // Update the member object with new details
+      String imageUrl ="";
+      if (_image != null) {
+        final Reference storageRef = FirebaseStorage.instance
+            .ref()
+            .child('profilePic')
+            .child('${_emailController.text}.jpg');
+
+        final UploadTask uploadTask = storageRef.putFile(_image!);
+        final TaskSnapshot storageSnapshot = await uploadTask;
+
+        // Get the download URL of the uploaded image
+        final String downloadUrl = await storageSnapshot.ref.getDownloadURL();
+        imageUrl = downloadUrl;
+      }
+
+      print("image url @MemberDetail850 ${imageUrl}");
+
       widget.member.name = _nameController.text;
       widget.member.level = _selectedLevel ?? widget.member.level;
       widget.member.age = int.parse(_ageController.text);
+      widget.member.imageUrl=imageUrl;
       widget.member.gender = _genderController.text;
       widget.member.email = _emailController.text;
       widget.member.phoneNumber = _phoneNumberController.text;

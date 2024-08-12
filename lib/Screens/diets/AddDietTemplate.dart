@@ -99,7 +99,7 @@ class _AddDietTemplatePageState extends State<AddDietTemplatePage> {
       builder: (context) {
         return AlertDialog(
           title: Text('Add Diet Item'),
-          backgroundColor: Colors.white10,
+          backgroundColor: appContainerColors,
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [

@@ -9,17 +9,17 @@ import '../Models/User.dart';
 class UserService {
   final String baseUrl = "${BASE_URL}/api";
 
-  Future<List<User>> getAllUsers() async {
+  Future<List<AppUser>> getAllUsers() async {
     final response = await http.get(Uri.parse('$baseUrl/users'));
     if (response.statusCode == 200) {
       final List<dynamic> jsonData = json.decode(response.body);
-      return jsonData.map((json) => User.fromJson(json)).toList();
+      return jsonData.map((json) => AppUser.fromJson(json)).toList();
     } else {
       throw Exception('Failed to load users');
     }
   }
 
-  Future<User> getUserById(String id) async {
+  Future<AppUser> getUserById(String id) async {
     final response = await http.get(Uri.parse('$baseUrl/users/$id'));
     if (response.statusCode == 200) {
       return user!;
@@ -28,27 +28,27 @@ class UserService {
     }
   }
 
-  Future<User> createUser(User user) async {
+  Future<AppUser> createUser(AppUser user) async {
     final response = await http.post(
       Uri.parse('$baseUrl/users'),
       headers: {'Content-Type': 'application/json'},
       body: json.encode(user.toJson()),
     );
     if (response.statusCode == 201) {
-      return User.fromJson(json.decode(response.body));
+      return AppUser.fromJson(json.decode(response.body));
     } else {
       throw Exception('Failed to create user');
     }
   }
 
-  Future<User> updateUser(String id, User user) async {
+  Future<AppUser> updateUser(String id, AppUser user) async {
     final response = await http.patch(
       Uri.parse('$baseUrl/users/$id'),
       headers: {'Content-Type': 'application/json'},
       body: json.encode(user.toJson()),
     );
     if (response.statusCode == 200) {
-      return User.fromJson(json.decode(response.body));
+      return AppUser.fromJson(json.decode(response.body));
     } else {
       throw Exception('Failed to update user');
     }
@@ -61,12 +61,12 @@ class UserService {
     }
   }
 
-  Future<User?> getUserByEmail(String email) async {
+  Future<AppUser?> getUserByEmail(String email) async {
     final url = '$baseUrl/users/email/$email';
     final response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
-      user = User.fromJson(json.decode(response.body));
+      user = AppUser.fromJson(json.decode(response.body));
       return user;
     } else {
       return null;

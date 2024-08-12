@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "84765251346",
+    "firebase_url": "https://kumbu-server-default-rtdb.firebaseio.com",
     "project_id": "kumbu-server",
     "storage_bucket": "kumbu-server.appspot.com"
   },
@@ -14,11 +15,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "84765251346-l98b0f1bknfvlkkn21t52utqe92npel4.apps.googleusercontent.com",
+          "client_id": "84765251346-t1toku28lb3ialh4u5b5or4svs88pb2c.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.kumbu_admin",
-            "certificate_hash": "b7a774db763d1f03e3d949affb13c5c14b3dcb9d"
+            "certificate_hash": "5258f2a4731299fa597a0e34afaad8a7ddde0d27"
           }
         },
         {

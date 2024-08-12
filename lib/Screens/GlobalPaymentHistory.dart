@@ -65,12 +65,12 @@ class _GlobalPaymentHistoryPageState extends State<GlobalPaymentHistoryPage> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text(
+               Text(
                 'Monthly Total Income: ',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: appLightGreen,
                 ),
               ),
 
@@ -79,7 +79,7 @@ class _GlobalPaymentHistoryPageState extends State<GlobalPaymentHistoryPage> {
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: appLightGreen,
+                  color: Colors.green[800],
                 ),
               ),
             ],

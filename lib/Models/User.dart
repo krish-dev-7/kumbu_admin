@@ -1,4 +1,4 @@
-class User {
+class AppUser {
   final String id;
   final String name;
   final String email;
@@ -6,7 +6,7 @@ class User {
   final List<String> assignedMembers;
   final List<String> membershipRequests;
 
-  User({
+  AppUser({
     required this.id,
     required this.name,
     required this.email,
@@ -15,8 +15,8 @@ class User {
     required this.membershipRequests,
   });
 
-  factory User.fromJson(Map<String, dynamic> json) {
-    return User(
+  factory AppUser.fromJson(Map<String, dynamic> json) {
+    return AppUser(
       id: json['_id'],
       name: json['name'],
       email: json['email'],
@@ -28,7 +28,6 @@ class User {
 
   Map<String, dynamic> toJson() {
     return {
-      '_id': id,
       'name': name,
       'email': email,
       'role': role,

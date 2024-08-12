@@ -47,7 +47,7 @@ class PaymentHistoryPage extends StatelessWidget {
                       'Package ID: ${purchaseOrder.packageId}',
                       style: TextStyle(
                         fontSize: 16,
-                        color: Colors.white70,
+                        // color: Colors.white70,
                       ),
                     ),
                     SizedBox(height: 4.0),
@@ -55,7 +55,7 @@ class PaymentHistoryPage extends StatelessWidget {
                       'Time of Purchase: ${_formatDate(purchaseOrder.timeOfPO)}',
                       style: TextStyle(
                         fontSize: 16,
-                        color: Colors.white70,
+                        // color: Colors.white70,
                       ),
                     ),
                     SizedBox(height: 4.0),
@@ -63,7 +63,7 @@ class PaymentHistoryPage extends StatelessWidget {
                       'Membership Start Date: ${_formatDate(purchaseOrder.membershipStartDate)}',
                       style: TextStyle(
                         fontSize: 16,
-                        color: Colors.white70,
+                        // color: Colors.white70,
                       ),
                     ),
                     SizedBox(height: 4.0),
@@ -71,7 +71,7 @@ class PaymentHistoryPage extends StatelessWidget {
                       'Membership End Date: ${_formatDate(purchaseOrder.membershipEndDate)}',
                       style: TextStyle(
                         fontSize: 16,
-                        color: Colors.white70,
+                        // color: Colors.white70,
                       ),
                     ),
                   ],
