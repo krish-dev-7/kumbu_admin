@@ -149,6 +149,14 @@ class AppDrawer extends StatelessWidget {
                 Navigator.pushNamed(context, '/TrainersListPage');
               },
             ),
+          if(user?.role=="Admin")
+            ListTile(
+              leading: Icon(Icons.calendar_month),
+              title: Text('Events Page'),
+              onTap: () {
+                Navigator.pushNamed(context, '/AddEventsPage');
+              },
+            ),
 
           //For Next Update
 

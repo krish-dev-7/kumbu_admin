@@ -132,6 +132,7 @@ class _AddUserPageState extends State<AddUserPage> {
                   return null;
                 },
               ),
+              SizedBox(height: 20,),
               TextFormField(
                 controller: _emailController,
                 decoration: InputDecoration(labelText: 'Email'),
@@ -164,6 +165,20 @@ class _AddUserPageState extends State<AddUserPage> {
                       title: Text('Manager'),
                       leading: Radio<String>(
                         value: 'Manager',
+                        groupValue: _role,
+                        onChanged: (value) {
+                          setState(() {
+                            _role = value!;
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: ListTile(
+                      title: Text('Receptionist'),
+                      leading: Radio<String>(
+                        value: 'Receptionist',
                         groupValue: _role,
                         onChanged: (value) {
                           setState(() {

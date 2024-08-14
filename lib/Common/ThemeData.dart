@@ -52,6 +52,7 @@ Color appTextColor = Color(0xff433536); // Light gray for backgrounds or less pr
 Color appMediumColor = Color(0xff911c24); // Light gray for backgrounds or less prominent elements
 Color appContainerColors = Color(0xfffffafa); // Light gray for backgrounds or less prominent elements
 Color appBackgroundColor = Color(0xffffffff);
+Color appTransparent = Color(0xffffff);
 
 void loadSavedColors() async {
   print(appDarkGreen.value);

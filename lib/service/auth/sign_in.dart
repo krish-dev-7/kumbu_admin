@@ -112,7 +112,7 @@ class _SignInScreenState extends State<SignInScreen> {
               const SizedBox(height: 10),
               GestureDetector(
                 child: Text(
-                  '                Not a member? View general events',
+                  '                Not a member? Contact Admin',
                   style: TextStyle(
                     fontWeight: FontWeight.w300,
                     fontSize: 13,

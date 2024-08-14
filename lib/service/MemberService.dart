@@ -106,11 +106,12 @@ class MemberService {
       throw Exception('Failed to update membership details');
     }
   }
-  Future<MemberResponse> getMembers({int page = 1, int limit = 30, String search = ''}) async {
+  Future<MemberResponse> getMembers({int page = 1, int limit = 50, String search = ''}) async {
     final response = await http.get(
       Uri.parse('$baseUrl/api/members?page=$page&limit=$limit&search=$search'),
     );
-
+//2, 17, 24, 17, 3, 23, 22
+    //2, 17, 25, 3, 23, 22
     if (response.statusCode == 200) {
       print(search +" searched -> "+ response.body);
       return MemberResponse.fromJson(json.decode(response.body));

@@ -17,6 +17,7 @@ import 'Models/Member.dart';
 import 'Screens/MembersListPage.dart';
 import 'Screens/PackagePage.dart';
 import 'Screens/ProfilePage.dart';
+import 'Screens/createEventPage.dart';
 import 'Screens/workouts/WokoutTemplateListScreen.dart';
 import 'firebase_options.dart';
 import 'Screens/MembershipRequestPage.dart';
@@ -45,7 +46,8 @@ void main() async {
       '/AttendancePage': (context) => AttendancePage(),
       '/MembershipRequestPage': (context) => MembershipRequestsPage(),
       '/ThemeChangePage': (context) => ColorPickerPage(),
-      '/TrainersListPage': (context)=>UserListPage()
+      '/TrainersListPage': (context)=>UserListPage(),
+      '/AddEventsPage' : (context)=> CreateEventPage()
     },
   ));
 }

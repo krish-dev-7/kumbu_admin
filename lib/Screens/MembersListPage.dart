@@ -44,7 +44,9 @@ class _MembersListPageState extends State<MembersListPage> {
             return true;
         }
       }).toList();
+      // sortMembersByDueDate(filteredMembers);
     });
+
   }
 
   Future<void> _fetchMembers({int page = 1, String search = ''}) async {
@@ -451,4 +453,11 @@ class _MembersListPageState extends State<MembersListPage> {
       ],
     );
   }
+}
+void sortMembersAlphabetically(List<GymMember> members) {
+  members.sort((a, b) => a.name.compareTo(b.name));
+}
+
+void sortMembersByDueDate(List<GymMember> members) {
+  members.sort((a, b) => a.membershipEndDate.compareTo(b.membershipEndDate));
 }
