@@ -106,20 +106,37 @@ class MemberService {
       throw Exception('Failed to update membership details');
     }
   }
-  Future<MemberResponse> getMembers({int page = 1, int limit = 50, String search = ''}) async {
-    final response = await http.get(
-      Uri.parse('$baseUrl/api/members?page=$page&limit=$limit&search=$search'),
-    );
-//2, 17, 24, 17, 3, 23, 22
-    //2, 17, 25, 3, 23, 22
+  Future<MemberResponse> getMembers({
+    int page = 1,
+    int limit = 50,
+    String search = '',
+    bool? isPT,
+  }) async {
+    // Construct the query parameters
+    final queryParams = {
+      'page': page.toString(),
+      'limit': limit.toString(),
+      'search': search,
+      if (isPT != null) 'isPT': isPT.toString(), // Add isPT parameter if provided
+    };
+
+    // Construct the URI with query parameters
+    final uri = Uri.parse('$baseUrl/api/members').replace(queryParameters: queryParams);
+
+    final response = await http.get(uri);
+    print(uri);
+
     if (response.statusCode == 200) {
-      print(search +" searched -> "+ response.body);
+      // print(uri.toString().contains("isPT")?'$search searched -> ${response.body}':"");
+      // print('$search searched -> ${response.body}');
       return MemberResponse.fromJson(json.decode(response.body));
+
     } else {
-      print(search +" searched -> "+ response.body);
+      print('$search searched -> ${response.body}');
       throw Exception('Failed to load members');
     }
   }
+
   Future<void> deleteMemberById(String memberId) async {
     final url = Uri.parse('$baseUrl/api/members/$memberId');
     final response = await http.delete(url);

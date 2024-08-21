@@ -21,6 +21,7 @@ class _MembersListPageState extends State<MembersListPage> {
   String searchQuery = "";
   int currentPage = 1;
   int totalPages = 1;
+  bool? isPTChecked;
 
   @override
   void initState() {
@@ -33,8 +34,8 @@ class _MembersListPageState extends State<MembersListPage> {
     setState(() {
       filteredMembers = _members.where((member) {
         switch (_selectedFilter) {
-          case MemberFilter.isPT:
-            return member.isPT;
+          // case MemberFilter.isPT:
+          //   return member.isPT;
           case MemberFilter.active:
             return member.isActive;
           case MemberFilter.inactive:
@@ -55,7 +56,7 @@ class _MembersListPageState extends State<MembersListPage> {
     });
     try {
       MemberService memberService = MemberService();
-      final result = await memberService.getMembers(page: page, search: search);
+      final result = await memberService.getMembers(page: page, search: search, isPT: isPTChecked);
       setState(() {
         _members = result.members;
         currentPage = result.currentPage;
@@ -144,7 +145,7 @@ class _MembersListPageState extends State<MembersListPage> {
                           const SizedBox(width: 5),
                           _buildRadioButton('Inactive', MemberFilter.inactive),
                           const SizedBox(width: 5),
-                          _buildRadioButton('PT', MemberFilter.isPT),
+                          _buildCheckBoxButton('PT', MemberFilter.isPT),
                         ],
                       ),
                     ),
@@ -450,6 +451,23 @@ class _MembersListPageState extends State<MembersListPage> {
               // color: Colors.white,
               ),
         ),
+      ],
+    );
+  }
+
+  Widget _buildCheckBoxButton(String s, MemberFilter isPT) {
+    return Row(
+      children: [
+        Checkbox(
+          value: isPTChecked ?? false,
+          onChanged: (bool? value) {
+            setState(() {
+              isPTChecked = value==false? null: value;
+              _fetchMembers(); // Fetch members when the checkbox state changes
+            });
+          },
+        ),
+        const Text('Show PT Members Only'),
       ],
     );
   }
