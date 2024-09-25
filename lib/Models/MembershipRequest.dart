@@ -48,7 +48,7 @@ class MembershipRequest {
     return MembershipRequest(
       id: json['_id'],
       requesterID: json['requesterID'],
-      requestedDate: DateTime.parse(json['requestedDate']).toLocal(),
+      requestedDate: DateTime.parse(json['requestedDate']),
       name: json['name'],
       age: json['age'],
       gender: json['gender'],

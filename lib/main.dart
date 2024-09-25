@@ -21,9 +21,11 @@ import 'Screens/createEventPage.dart';
 import 'Screens/workouts/WokoutTemplateListScreen.dart';
 import 'firebase_options.dart';
 import 'Screens/MembershipRequestPage.dart';
+import 'package:flutter_web_plugins/url_strategy.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  usePathUrlStrategy();
   // FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
