@@ -22,6 +22,7 @@ class MembershipRequest {
   final String address;
   final List<String> purchaseOrderHistories;
   final bool isApproved;
+  final String notes;
 
   MembershipRequest({
     this.id,
@@ -42,6 +43,7 @@ class MembershipRequest {
     required this.isPT,
     this.purchaseOrderHistories = const[],
     required this.isApproved,
+    required this.notes
   });
 
   factory MembershipRequest.fromJson(Map<String, dynamic> json) {
@@ -62,6 +64,7 @@ class MembershipRequest {
       address: json['address'],
       purchaseOrderHistories: List<String>.from(json['purchaseOrderHistories']),
       isApproved: json['isApproved'], requesterName: json['requesterName'], isPT: json['isPT'],
+      notes: json['notes']
     );
   }
 
@@ -79,7 +82,8 @@ class MembershipRequest {
       currentPackageID: member.currentPackage, // Assign selected package
       level: member.level.name, // Example: Set membership level
       requesterID: requesterID, requestedDate: DateTime.now(), isApproved: false,
-      requesterName: requesterName, isPT: member.isPT
+      requesterName: requesterName, isPT: member.isPT,
+        notes: member.notes
       );
   }
 
@@ -102,7 +106,8 @@ class MembershipRequest {
       'address': address,
       'purchaseOrderHistories': purchaseOrderHistories,
       'isApproved': isApproved,
-      'isPT': isPT
+      'isPT': isPT,
+      'notes': notes
     };
   }
 }

@@ -48,11 +48,13 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
   late TextEditingController _ageController;
   late TextEditingController _genderController;
   late TextEditingController _emailController;
+  late TextEditingController _notesController;
   late TextEditingController _phoneNumberController;
   late TextEditingController _addressController;
   late TextEditingController _membershipStartDateController;
   late TextEditingController _membershipEndDateController;
   final TextEditingController imageUrlController = TextEditingController();
+
 
   Package? _selectedPackage;
   late bool isPT;
@@ -73,6 +75,7 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
     _ageController = TextEditingController(text: widget.member.age.toString());
     _genderController = TextEditingController(text: widget.member.gender);
     _emailController = TextEditingController(text: widget.member.email);
+    _notesController = TextEditingController(text: widget.member.notes);
     _phoneNumberController =
         TextEditingController(text: widget.member.phoneNumber);
     _addressController = TextEditingController(text: widget.member.address);
@@ -231,6 +234,8 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
                       _buildDietAssignmentSection()),
                   _buildSection(context, 'Workout Assignment',
                       _buildWorkoutAssignmentSection()),
+                  _buildSection(context, 'Notes',
+                      _buildNotesSection()),
                 ],
               ),
               const SizedBox(height: 16),
@@ -327,6 +332,12 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
       _buildEditableDetailRow(
           Icons.phone, 'Phone Number', _phoneNumberController),
       _buildEditableDetailRow(Icons.home, 'Address', _addressController),
+    ]);
+  }
+
+  Widget _buildNotesSection() {
+    return _buildDetailTable([
+      _buildEditableDetailRow(Icons.notes, 'Notes', _notesController),
     ]);
   }
 
@@ -867,6 +878,7 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
       widget.member.imageUrl=imageUrl;
       widget.member.gender = _genderController.text;
       widget.member.email = _emailController.text;
+      widget.member.notes = _notesController.text;
       widget.member.phoneNumber = _phoneNumberController.text;
       widget.member.address = _addressController.text;
       widget.member.membershipStartDate =

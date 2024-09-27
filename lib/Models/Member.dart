@@ -31,6 +31,7 @@ class GymMember {
    List<dynamic> purchaseOrderHistories;
    String dietTemplateID;
    int daysAttended;
+  String notes;
 
   GymMember({
     required this.id,
@@ -51,7 +52,7 @@ class GymMember {
     this.isPT=false,
     this.purchaseOrderHistories = const [],
     this.dietTemplateID = "",
-    required this.daysAttended,
+    required this.daysAttended, required this.notes,
   });
 
   // Method to calculate the remaining days of membership
@@ -99,6 +100,7 @@ class GymMember {
       'purchaseOrderHistories': purchaseOrderHistories.map((order) => order.toMap()).toList(),
       'dietTemplateID': "",
       'daysAttended': daysAttended,
+      'notes':notes
     };
   }
 
@@ -124,6 +126,7 @@ class GymMember {
       purchaseOrderHistories: List<dynamic>.from(map['purchaseOrderHistories'].map((order) => PurchaseOrder.fromMap(order))),
       dietTemplateID: map['dietTemplateID'] ?? "",
       daysAttended: map['daysAttended'],
+      notes: map['notes']
     );
   }
 }

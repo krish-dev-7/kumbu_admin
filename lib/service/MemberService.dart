@@ -79,7 +79,8 @@ class MemberService {
         'currentPackageID':member.currentPackage?.packageID,
         'membershipStartDate':member.membershipStartDate.toString(),
         'membershipEndDate':member.membershipEndDate.toString(),
-        'level':member.level.name
+        'level':member.level.name,
+        'notes':member.notes
         // Add other member fields as needed
       }),
     );

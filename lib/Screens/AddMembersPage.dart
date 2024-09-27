@@ -24,6 +24,7 @@ class AddMemberPage extends StatefulWidget {
 }
 
 class _AddMemberPageState extends State<AddMemberPage> {
+  final TextEditingController gymMemberIDController = TextEditingController();
   final TextEditingController imageUrlController = TextEditingController();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController ageController = TextEditingController();
@@ -31,6 +32,7 @@ class _AddMemberPageState extends State<AddMemberPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneNumberController = TextEditingController();
   final TextEditingController addressController = TextEditingController();
+  final TextEditingController notesController = TextEditingController();
   // final TextEditingController membershipDurationController = TextEditingController();
   final TextEditingController membershipStartDateController =
       TextEditingController();
@@ -143,12 +145,14 @@ class _AddMemberPageState extends State<AddMemberPage> {
             ),
           ), // Member Image
           const SizedBox(height: 10),
+          _buildTextField(context, 'Member ID', gymMemberIDController),
           _buildTextField(context, 'Name', nameController),
           _buildTextField(context, 'Age', ageController),
           _buildTextField(context, 'Gender', genderController),
           _buildTextField(context, 'Email', emailController),
           _buildTextField(context, 'Phone Number', phoneNumberController),
           _buildTextField(context, 'Address', addressController),
+          _buildTextField(context, 'Notes', notesController),
           _buildPackageDropdown(context), // Package selection dropdown
           _buildDateField(
               context, 'Membership Start Date', membershipStartDateController),
@@ -253,7 +257,7 @@ class _AddMemberPageState extends State<AddMemberPage> {
                               });
                             },
                           ),
-                          Text("Personal Training)"),
+                          Text("Personal Training"),
                         ],
                       ),
 
@@ -300,12 +304,14 @@ class _AddMemberPageState extends State<AddMemberPage> {
 
   List<Widget> _buildFormFields(BuildContext context) {
     return [
+      _buildTextField(context, 'Member ID', gymMemberIDController),
       _buildTextField(context, 'Name', nameController),
       _buildTextField(context, 'Age', ageController),
       _buildTextField(context, 'Gender', genderController),
       _buildTextField(context, 'Email', emailController),
       _buildTextField(context, 'Phone Number', phoneNumberController),
       _buildTextField(context, 'Address', addressController),
+      _buildTextField(context, 'Notes', notesController),
     ];
   }
 
@@ -440,6 +446,7 @@ class _AddMemberPageState extends State<AddMemberPage> {
       }
 
 
+      int gymMemberID = int.tryParse(gymMemberIDController.text)??0;
       String name = nameController.text;
       int age = int.tryParse(ageController.text) ??
           0; // Handle parsing error as needed
@@ -447,6 +454,7 @@ class _AddMemberPageState extends State<AddMemberPage> {
       String email = emailController.text;
       String phoneNumber = phoneNumberController.text;
       String address = addressController.text;
+      String notes = notesController.text;
       String membershipDuration = _selectedPackage!.getReadableDuration();
       String membershipStartDate = membershipStartDateController.text;
       String membershipEndDate = membershipEndDateController.text;
@@ -465,11 +473,12 @@ class _AddMemberPageState extends State<AddMemberPage> {
         membershipStartDate: DateTime.parse(membershipStartDate),
         membershipEndDate: DateTime.parse(membershipEndDate),
         id: '', // Assign member ID as needed
-        gymMemberID: 0,
+        gymMemberID: gymMemberID,
         currentPackage: _selectedPackage, // Assign selected package
         level: MembershipLevel.BRONZE, // Example: Set membership level
         dietTemplateID: "", // Example: Set diet ID
         daysAttended: 0, // Example: Set days attended
+        notes: notes
       );
 
       print(user?.role);
